@@ -109,7 +109,7 @@ preflect: preflect.o ${LIBPFRING}
 	${CC} ${CFLAGS} preflect.o ${LIBS} -o $@
 
 pfsend: pfsend.o ${LIBPFRING}
-	${CC} ${CFLAGS} pfsend.o ${LIBS} -o $@
+	${CC} ${CFLAGS} pfsend.o ${LIBS} -o $@ -lm
 
 pflatency: pflatency.o ${LIBPFRING}
 	${CC} ${CFLAGS} pflatency.o ${LIBS} -o $@
