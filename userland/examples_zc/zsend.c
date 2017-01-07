@@ -100,9 +100,12 @@ u_char use_lock_buffer = 0;
 struct lock_buffer * lb_buffer;
 
 static inline void get_packet_timestamp(struct id_time * it) {
+    puts("getting timestamp");
     u_int64_t ts = *pulse_timestamp_ns_n;
+    puts("extracting values");
     it->sec  = ts >> 32; 
     it->nsec = ts & 0xffffffff;
+    puts("done getting ts");
 }
 
 /* *************************************** */
