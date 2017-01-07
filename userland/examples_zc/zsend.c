@@ -403,6 +403,8 @@ void *send_traffic(void *user) {
   u_int32_t buffer_id = 0;
   int sent_bytes, verbose = 0;
   
+  puts("sending traffic");
+  
   /* lock buffer */
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
