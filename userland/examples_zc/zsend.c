@@ -359,6 +359,7 @@ void sigproc(int sig) {
   if(called) return; else called = 1;
 
   do_shutdown = 1;
+  lock_buffer_finish(lb_buffer);
 
   pfring_zc_queue_breakloop(zq);
 }
