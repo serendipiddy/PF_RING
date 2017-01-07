@@ -94,6 +94,10 @@ double gbit_s = 0;
 volatile u_int64_t *pulse_timestamp_ns;
 volatile u_int64_t *pulse_timestamp_ns_n;
 
+/* lock buffer */
+u_char use_lock_buffer = 0; 
+struct lock_buffer * lb_buffer;
+
 /* *************************************** */
 
 typedef u_int64_t ticks;
@@ -380,6 +384,7 @@ void printHelp(void) {
   printf("-z              Use burst API\n");
   printf("-a              Active packet wait\n");
   printf("-Q <sock>       Enable VM support to attach a consumer from a VM (<sock> is a QEMU monitor sockets)\n");
+  printf("-X <filename>   Log file name for timestamps of packets captured\n");
   exit(-1);
 }
 
@@ -390,6 +395,12 @@ void *send_traffic(void *user) {
   u_int64_t ts_ns_start = 0, ns_delta = 0;
   u_int32_t buffer_id = 0;
   int sent_bytes, verbose = 0;
+  
+  /* lock buffer */
+  struct id_time * lb_it = malloc( sizeof(struct it_time) ); 
+  lb_it->id = 0;
+  // u_int64_t lb_packet_id = 0; // is inside the struct above
+  
 #ifdef BURST_API
   int i, sent_packets;
 #endif
@@ -562,8 +573,8 @@ void *send_traffic(void *user) {
 
       /* TODO send unsent packets when a burst is partially sent */
       while (unlikely((sent_packets = pfring_zc_send_pkt_burst(zq, &buffers[buffer_id], BURSTLEN, flush_packet)) <= 0)) {
-	if (unlikely(do_shutdown)) break;
-	if (!active) usleep(1);
+        if (unlikely(do_shutdown)) break;
+        if (!active) usleep(1);
       }
 
       numPkts += sent_packets;
@@ -573,14 +584,14 @@ void *send_traffic(void *user) {
       buffer_id &= NBUFFMASK;
 
       if(pps > 0) {
-	u_int8_t synced = 0;
-	if (use_pulse_time) {
-	  while(*pulse_timestamp_ns - ts_ns_start < numPkts * ns_delta && !do_shutdown)
-	    if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
-	} else {
-	  while((getticks() - tick_start) < (numPkts * tick_delta))
-	    if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
-	}
+        u_int8_t synced = 0;
+        if (use_pulse_time) {
+          while(*pulse_timestamp_ns - ts_ns_start < numPkts * ns_delta && !do_shutdown)
+            if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
+        } else {
+          while((getticks() - tick_start) < (numPkts * tick_delta))
+            if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
+        }
       }
 
     } 
@@ -607,12 +618,26 @@ void *send_traffic(void *user) {
       }
 
       if (append_timestamp)
-	buffers[buffer_id]->len = append_packet_ts(buffer, buffers[buffer_id]->len);
+        buffers[buffer_id]->len = append_packet_ts(buffer, buffers[buffer_id]->len);
+    
+      if (use_lock_buffer)
+      {
+          lb_it->id++;
+          get_packet_timestamp(lb_it);
+          lock_buffer_push (lb_buffer, lb_it);
+      }
 
       while (unlikely((sent_bytes = pfring_zc_send_pkt(zq, &buffers[buffer_id], flush_packet)) < 0)) {
-	if (unlikely(do_shutdown)) break;
-	if (!active) usleep(1);
+        if (unlikely(do_shutdown)) break;
+        if (!active) usleep(1);
       }
+      
+      /* Test time stamp for *after* the packet has been sent */
+      // if (use_lock_buffer)
+      // {
+          // get_packet_timestamp(lb_it);
+          // lock_buffer_push (lb_buffer, lb_it);
+      // }
 
       numPkts++;
       numBytes += sent_bytes + 24; /* 8 Preamble + 4 CRC + 12 IFG */
@@ -621,14 +646,14 @@ void *send_traffic(void *user) {
       buffer_id &= NBUFFMASK;
 
       if(pps > 0) {
-	u_int8_t synced = 0;
-	if (use_pulse_time) {
-	  while(*pulse_timestamp_ns - ts_ns_start < numPkts * ns_delta && !do_shutdown)
-	    if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
-	} else {
-	  while((getticks() - tick_start) < (numPkts * tick_delta))
-	    if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
-	}
+        u_int8_t synced = 0;
+        if (use_pulse_time) {
+          while(*pulse_timestamp_ns - ts_ns_start < numPkts * ns_delta && !do_shutdown)
+            if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
+        } else {
+          while((getticks() - tick_start) < (numPkts * tick_delta))
+            if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
+        }
       }
     }
 
@@ -638,6 +663,8 @@ void *send_traffic(void *user) {
 
   if (!flush_packet) 
     pfring_zc_sync_queue(zq, tx_only);
+
+  free(it); /* lock buffer */
 
   return NULL;
 }
@@ -654,7 +681,7 @@ int main(int argc, char* argv[]) {
 
   startTime.tv_sec = 0;
 
-  while((c = getopt(argc,argv,"ab:c:f:g:hi:m:n:o:p:r:l:zN:S:P:Q:")) != '?') {
+  while((c = getopt(argc,argv,"ab:c:f:g:hi:m:n:o:p:r:l:zN:S:P:Q:X:")) != '?') {
     if((c == 255) || (c == -1)) break;
 
     switch(c) {
@@ -735,6 +762,9 @@ int main(int argc, char* argv[]) {
       use_pulse_time = 1;
       bind_time_pulse_core = atoi(optarg);
       break;
+    case 'X':
+      use_lock_buffer = 1;
+      lock_buffer_filename = strdup(otgarg);
     }
   }
 
@@ -888,7 +918,18 @@ int main(int argc, char* argv[]) {
   if (append_timestamp || use_pulse_time) pthread_create(&time_thread, NULL, time_pulse_thread, NULL);
   if (use_pulse_time)   while (!*pulse_timestamp_ns   && !do_shutdown); /* wait for ts */
   if (append_timestamp) while (!*pulse_timestamp_ns_n && !do_shutdown); /* wait for ts */
-
+  
+  /* Lock buffer init */
+  if (use_lock_buffer) 
+  {
+      int sample_secs = 240; // 4 minutes of data
+      pthread_t buffer_write_thread_id;
+      lb_buffer = lock_buffer_create(pps, sizeof(struct id_time), sample_secs);
+      pthread_create( &buffer_write_thread_id, NULL, lock_buffer_write_loop, lb_buffer);
+      lock_buffer_log_fp = fopen(lock_buffer_filename, "w+b"); 
+      puts("Lock buffer thread created and file opened");
+  }
+  
   pthread_create(&thread, NULL, send_traffic, NULL);
 
   while (!do_shutdown) {

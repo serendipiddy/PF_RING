@@ -182,6 +182,7 @@ void printHelp(void) {
   printf("-S <core id>    Pulse-time thread for inter-packet time check\n");
   printf("-C              Check license\n");
   printf("-v              Verbose\n");
+  printf("-X <filename>   Log file name for timestamps of packets captured\n");
 }
 
 /* *************************************** */
@@ -269,7 +270,7 @@ int main(int argc, char* argv[]) {
   lastTime.tv_sec = 0;
   startTime.tv_sec = 0;
 
-  while((c = getopt(argc,argv,"ac:g:hi:vCRHS:")) != '?') {
+  while((c = getopt(argc,argv,"ac:g:hi:vCRHS:X:")) != '?') {
     if((c == 255) || (c == -1)) break;
 
     switch(c) {
@@ -305,6 +306,8 @@ int main(int argc, char* argv[]) {
     case 'C':
       print_maintenance = 1;
       break;
+    case 'X':
+      lock_buffer_filename = strdup(otgarg);
     }
   }
   
