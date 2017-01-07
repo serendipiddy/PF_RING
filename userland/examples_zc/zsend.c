@@ -625,8 +625,8 @@ void *send_traffic(void *user) {
 	}
       }
 
-      if (append_timestamp)
-        buffers[buffer_id]->len = append_packet_ts(buffer, buffers[buffer_id]->len);
+      // if (append_timestamp)
+        // buffers[buffer_id]->len = append_packet_ts(buffer, buffers[buffer_id]->len);
     
       if (use_lock_buffer)
       {
@@ -643,8 +643,9 @@ void *send_traffic(void *user) {
       /* Test time stamp for *after* the packet has been sent */
       // if (use_lock_buffer)
       // {
+          // lb_it->id;
           // get_packet_timestamp(lb_it);
-          // lock_buffer_push (lb_buffer, lb_it);
+          // lock_buffer_push (lb_buffer, lb_it); 
       // }
 
       numPkts++;
