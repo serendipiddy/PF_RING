@@ -632,6 +632,7 @@ void *send_traffic(void *user) {
           puts("hello using lb");
           lb_it->id++;
           get_packet_timestamp(lb_it);
+          puts("middle lb");
           lock_buffer_push (lb_buffer, lb_it);
           puts("/ hello using lb");
       }
