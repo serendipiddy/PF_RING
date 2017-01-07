@@ -151,6 +151,8 @@ void * lock_buffer_write_loop( void * x ) { // struct lock_buffer * lb) {
     struct lock_buffer * lb = (struct lock_buffer *) x;
     struct lock_buffer_section * lbs = malloc( sizeof(struct lock_buffer_section) );
     
+    printf("write loop starting, lock step: %d\n", lb->lock_step);
+    
     // printf("location of lb - write loop: 0x%X\n", lb);
     // printf("finish signal - write loop: %d\n", lb->finish_signal);
     while (!lb->finish_signal) {
@@ -162,6 +164,7 @@ void * lock_buffer_write_loop( void * x ) { // struct lock_buffer * lb) {
         // printf("  Wrote 0x%X (%d)\n      - 0x%X (%d)\n", lbs->start, lbs->start - lb->buffer, lbs->end,  lbs->end - lb->buffer);
     }
     // puts("finish signal heard in write loop, writing remaining data");
+    puts("finish signal heard in write loop");
     
     // write the remaining items
     // lock_buffer_pull_final(lb, lbs);
