@@ -629,12 +629,9 @@ void *send_traffic(void *user) {
     
       if (use_lock_buffer)
       {
-          puts("hello using lb");
           lb_it->id++;
           get_packet_timestamp(lb_it);
-          puts("middle lb");
           lock_buffer_push (lb_buffer, lb_it);
-          puts("/ hello using lb");
       }
 
       while (unlikely((sent_bytes = pfring_zc_send_pkt(zq, &buffers[buffer_id], flush_packet)) < 0)) {
@@ -926,12 +923,10 @@ int main(int argc, char* argv[]) {
   signal(SIGINT,  sigproc);
 
   if (use_pulse_time)   pulse_timestamp_ns   = calloc(CACHE_LINE_LEN/sizeof(u_int64_t), sizeof(u_int64_t));
-  if (append_timestamp || use_lock_buffer) pulse_timestamp_ns_n = calloc(CACHE_LINE_LEN/sizeof(u_int64_t), sizeof(u_int64_t));
-  if (append_timestamp || use_pulse_time || use_lock_buffer) pthread_create(&time_thread, NULL, time_pulse_thread, NULL);
+  if (append_timestamp) pulse_timestamp_ns_n = calloc(CACHE_LINE_LEN/sizeof(u_int64_t), sizeof(u_int64_t));
+  if (append_timestamp || use_pulse_time) pthread_create(&time_thread, NULL, time_pulse_thread, NULL);
   if (use_pulse_time)   while (!*pulse_timestamp_ns   && !do_shutdown); /* wait for ts */
-  puts("b4 while");
-  if (append_timestamp || use_lock_buffer) while (!*pulse_timestamp_ns_n && !do_shutdown); /* wait for ts */
-  puts("after while");
+  if (append_timestamp) while (!*pulse_timestamp_ns_n && !do_shutdown); /* wait for ts */
   
   /* Lock buffer init */
   if (use_lock_buffer) 
