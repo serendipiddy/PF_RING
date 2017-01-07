@@ -952,6 +952,9 @@ int main(int argc, char* argv[]) {
   if (append_timestamp || use_pulse_time)
     pthread_join(time_thread, NULL);
 
+  if (use_lock_buffer) 
+      pthread_join(buffer_write_thread_id, NULL);
+
   if (!ipc_q_attach) {
     pfring_zc_destroy_cluster(zc);
   } else {
