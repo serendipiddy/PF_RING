@@ -403,8 +403,6 @@ void *send_traffic(void *user) {
   u_int32_t buffer_id = 0;
   int sent_bytes, verbose = 0;
   
-  puts("sending traffic");
-  
   /* lock buffer */
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
@@ -690,6 +688,8 @@ int main(int argc, char* argv[]) {
   char *vm_sock = NULL;
   int i, rc, ipc_q_attach = 0;
   char ebuf[256];
+  
+  pthread_t buffer_write_thread_id; /* lock buffer */
 
   startTime.tv_sec = 0;
 
@@ -929,13 +929,14 @@ int main(int argc, char* argv[]) {
   if (append_timestamp || use_lock_buffer) pulse_timestamp_ns_n = calloc(CACHE_LINE_LEN/sizeof(u_int64_t), sizeof(u_int64_t));
   if (append_timestamp || use_pulse_time || use_lock_buffer) pthread_create(&time_thread, NULL, time_pulse_thread, NULL);
   if (use_pulse_time)   while (!*pulse_timestamp_ns   && !do_shutdown); /* wait for ts */
+  puts("b4 while");
   if (append_timestamp || use_lock_buffer) while (!*pulse_timestamp_ns_n && !do_shutdown); /* wait for ts */
+  puts("after while");
   
   /* Lock buffer init */
   if (use_lock_buffer) 
   {
       int sample_secs = 240; // 4 minutes of data
-      pthread_t buffer_write_thread_id;
       lb_buffer = lock_buffer_create(pps, sizeof(struct id_time), sample_secs);
       pthread_create( &buffer_write_thread_id, NULL, lock_buffer_write_loop, lb_buffer);
       lock_buffer_log_fp = fopen(lock_buffer_filename, "w+b"); 
