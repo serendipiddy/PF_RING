@@ -643,7 +643,7 @@ void *send_traffic(void *user) {
       /* Test time stamp for *after* the packet has been sent */
       // if (use_lock_buffer)
       // {
-          // lb_it->id;
+          // lb_it->id; 
           // get_packet_timestamp(lb_it);
           // lock_buffer_push (lb_buffer, lb_it); 
       // }

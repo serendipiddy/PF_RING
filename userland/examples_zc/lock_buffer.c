@@ -154,27 +154,24 @@ void * lock_buffer_write_loop( void * x ) { // struct lock_buffer * lb) {
     struct lock_buffer * lb = (struct lock_buffer *) x;
     struct lock_buffer_section * lbs = malloc( sizeof(struct lock_buffer_section) );
     
-    printf("write loop starting, lock step: %d item_num: %d\n", lb->lock_step, lb->item_num);
+    printf("write loop starting, lock step: %d num in buffer: %d\n", lb->lock_step, lb->item_num);
     
-    printf("location of lb - write loop: 0x%X\n", lb->buffer);
+    // printf("location of lb - write loop: 0x%X\n", lb->buffer);
     int writes = 0;
     // printf("finish signal - write loop: %d\n", lb->finish_signal);
+    lock_buffer_pull(lb, lbs);
     while (!lb->finish_signal) {
-        // printf("## write loop: %d \n", i++);
-        lock_buffer_pull(lb, lbs);
-        if (lb->finish_signal) break;
         fwrite(lbs->start, sizeof(struct id_time), lbs->end - lbs->start, lock_buffer_log_fp);
         writes++;
-        // printf("  pos_push: %d pos_pull: %d\n", lb->pos_push, lb->pos_pull);
-        // printf("  Wrote 0x%X (%d)\n      - 0x%X (%d)\n", lbs->start, lbs->start - lb->buffer, lbs->end,  lbs->end - lb->buffer);
+        lock_buffer_pull(lb, lbs);
     }
     // puts("finish signal heard in write loop, writing remaining data");
-    printf("Finish signal heard in write loop, written %d times\n", writes);
+    printf("Finish signal heard in write loop, written %d times. getting unwritten data.\n", writes);
     
     // write the remaining items
-    // lock_buffer_pull_final(lb, lbs);
+    lock_buffer_pull_final(lb, lbs);
     // printf("  Final write: 0x%X (%d)",lbs->start, (lbs->end - lbs->start));
-    // fwrite(lbs->start, sizeof(struct id_time), lbs->end - lbs->start, lock_buffer_log_fp);
+    fwrite(lbs->start, sizeof(struct id_time), lbs->end - lbs->start, lock_buffer_log_fp);
     
     return NULL;
 }
