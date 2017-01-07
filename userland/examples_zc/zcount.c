@@ -71,6 +71,11 @@ u_int64_t threshold_min_count = 0, threshold_max_count = 0;
 
 volatile u_int64_t *pulse_timestamp_ns;
 
+/* lock buffer */
+#include <lock_buffer.c>
+u_char use_lock_buffer = 0; 
+struct lock_buffer * lb_buffer;
+
 /* ******************************** */
 
 void *time_pulse_thread(void *data) {
