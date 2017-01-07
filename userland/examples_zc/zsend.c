@@ -764,7 +764,7 @@ int main(int argc, char* argv[]) {
       break;
     case 'X':
       use_lock_buffer = 1;
-      lock_buffer_filename = strdup(otgarg);
+      lock_buffer_filename = strdup(optarg);
     }
   }
 

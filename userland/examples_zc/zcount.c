@@ -307,7 +307,7 @@ int main(int argc, char* argv[]) {
       print_maintenance = 1;
       break;
     case 'X':
-      lock_buffer_filename = strdup(otgarg);
+      lock_buffer_filename = strdup(optarg);
     }
   }
   
