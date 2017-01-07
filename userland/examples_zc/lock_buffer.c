@@ -72,7 +72,7 @@ static inline void lock_buffer_push (struct lock_buffer * lb, struct id_time* it
     // printf("  Pushing item to buffer\n");
     
     lb->buffer[lb->pos_push] = *item;
-    printf(" packet pushed: %lu, %d.%d\n", item->id, item->sec, item->nsec);
+    printf(" packet pushed: %lu, %zu.%zu\n", item->id, item->sec, item->nsec);
     // lb->buffer[ lb->pos_push ].id = item->id;
     // lb->buffer[ lb->pos_push ].ts = item->ts;
     

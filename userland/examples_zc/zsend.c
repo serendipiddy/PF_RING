@@ -632,7 +632,7 @@ void *send_traffic(void *user) {
       {
           lb_it->id++;
           get_packet_timestamp(lb_it);
-          lock_buffer_push (lb_buffer, lb_it);
+          lock_buffer_push (lb_buffer, lb_it); 
       }
 
       while (unlikely((sent_bytes = pfring_zc_send_pkt(zq, &buffers[buffer_id], flush_packet)) < 0)) {
