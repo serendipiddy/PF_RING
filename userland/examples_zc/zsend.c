@@ -932,7 +932,7 @@ int main(int argc, char* argv[]) {
   /* Lock buffer init */
   if (use_lock_buffer) 
   {
-      unsigned int sample_secs = 10;  // // 4 minutes of data
+      unsigned int sample_secs = pps * 20;  // // 4 minutes of data
       // printf("sample secs: %d\n", sample_secs);
       lb_buffer = lock_buffer_create(pps, sizeof(struct id_time), sample_secs);
       pthread_create( &buffer_write_thread_id, NULL, lock_buffer_write_loop, lb_buffer);
