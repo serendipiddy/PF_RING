@@ -72,7 +72,7 @@ static inline void lock_buffer_push (struct lock_buffer * lb, struct id_time* it
     // printf("  Pushing item to buffer\n");
     
     lb->buffer[lb->pos_push] = *item;
-    printf(" packet pushed: %lu, %zu.%zu\n", item->id, item->sec, item->nsec);
+    // printf(" packet pushed: %lu, %zu.%zu\n", item->id, item->sec, item->nsec);
     // lb->buffer[ lb->pos_push ].id = item->id;
     // lb->buffer[ lb->pos_push ].ts = item->ts;
     
@@ -157,17 +157,19 @@ void * lock_buffer_write_loop( void * x ) { // struct lock_buffer * lb) {
     printf("write loop starting, lock step: %d item_num: %d\n", lb->lock_step, lb->item_num);
     
     printf("location of lb - write loop: 0x%X\n", lb->buffer);
+    int writes = 0;
     // printf("finish signal - write loop: %d\n", lb->finish_signal);
     while (!lb->finish_signal) {
         // printf("## write loop: %d \n", i++);
         lock_buffer_pull(lb, lbs);
         if (lb->finish_signal) break;
         fwrite(lbs->start, sizeof(struct id_time), lbs->end - lbs->start, lock_buffer_log_fp);
+        writes++;
         // printf("  pos_push: %d pos_pull: %d\n", lb->pos_push, lb->pos_pull);
-        printf("  Wrote 0x%X (%d)\n      - 0x%X (%d)\n", lbs->start, lbs->start - lb->buffer, lbs->end,  lbs->end - lb->buffer);
+        // printf("  Wrote 0x%X (%d)\n      - 0x%X (%d)\n", lbs->start, lbs->start - lb->buffer, lbs->end,  lbs->end - lb->buffer);
     }
     // puts("finish signal heard in write loop, writing remaining data");
-    puts("finish signal heard in write loop");
+    printf("Finish signal heard in write loop, written %d times\n", writes);
     
     // write the remaining items
     // lock_buffer_pull_final(lb, lbs);
