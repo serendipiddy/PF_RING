@@ -150,7 +150,6 @@ struct lock_buffer * lock_buffer_create (int pkt_rate, int data_size, int second
 void * lock_buffer_write_loop( void * x ) { // struct lock_buffer * lb) { 
     struct lock_buffer * lb = (struct lock_buffer *) x;
     struct lock_buffer_section * lbs = malloc( sizeof(struct lock_buffer_section) );
-    int i = 0;
     
     // printf("location of lb - write loop: 0x%X\n", lb);
     // printf("finish signal - write loop: %d\n", lb->finish_signal);
