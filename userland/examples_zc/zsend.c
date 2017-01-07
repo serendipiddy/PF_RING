@@ -101,8 +101,8 @@ struct lock_buffer * lb_buffer;
 
 static inline get_packet_timestamp(struct id_time * it) {
     u_int64_t ts = *pulse_timestamp_ns_n;
-    ts->sec  = ts >> 32; 
-    ts->nsec = ts & 0xffffffff;
+    it->sec  = ts >> 32; 
+    it->nsec = ts & 0xffffffff;
 }
 
 /* *************************************** */
@@ -404,7 +404,7 @@ void *send_traffic(void *user) {
   int sent_bytes, verbose = 0;
   
   /* lock buffer */
-  struct id_time * lb_it = malloc( sizeof(struct it_time) ); 
+  struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
   // u_int64_t lb_packet_id = 0; // is inside the struct above
   
@@ -671,7 +671,7 @@ void *send_traffic(void *user) {
   if (!flush_packet) 
     pfring_zc_sync_queue(zq, tx_only);
 
-  free(it); /* lock buffer */
+  free(lb_it); /* lock buffer */
 
   return NULL;
 }
