@@ -38,6 +38,7 @@ struct lock_buffer_section {
 # define NUMBER_OF_LOCKS 5
 void lock_buffer_init (struct lock_buffer * lb, size_t elem_size, size_t item_num) {
     int i;
+    item_num = abs(item_num);
     
     printf("  Init lock buffer, item size: %d num: %d \n", elem_size, item_num);
     
