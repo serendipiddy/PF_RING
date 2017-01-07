@@ -12,12 +12,6 @@ struct id_time {
     u_int32_t nsec;
 };
 
-static inline get_packet_timestamp(struct id_time * it) {
-    u_int64_t ts = *pulse_timestamp_ns_n;
-    ts->sec  = ts >> 32; 
-    ts->nsec = ts & 0xffffffff;
-}
-
 /* Lock buffer file pointer */
 FILE * lock_buffer_log_fp;
 char * lock_buffer_filename;
