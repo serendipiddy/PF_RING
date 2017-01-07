@@ -629,6 +629,7 @@ void *send_traffic(void *user) {
     
       if (use_lock_buffer)
       {
+          puts("hello using lb");
           lb_it->id++;
           get_packet_timestamp(lb_it);
           lock_buffer_push (lb_buffer, lb_it);
