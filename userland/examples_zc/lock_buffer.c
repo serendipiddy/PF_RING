@@ -35,7 +35,7 @@ struct lock_buffer_section {
     struct id_time * end;
 };
 
-# define NUMBER_OF_LOCKS 2
+# define NUMBER_OF_LOCKS 5
 void lock_buffer_init (struct lock_buffer * lb, size_t elem_size, int item_num) {
     int i;
     
@@ -151,7 +151,7 @@ void * lock_buffer_write_loop( void * x ) { // struct lock_buffer * lb) {
     struct lock_buffer * lb = (struct lock_buffer *) x;
     struct lock_buffer_section * lbs = malloc( sizeof(struct lock_buffer_section) );
     
-    printf("write loop starting, lock step: %d\n", lb->lock_step);
+    printf("write loop starting, lock step: %d item_num: %d\n", lb->lock_step, lb->item_num);
     
     // printf("location of lb - write loop: 0x%X\n", lb);
     // printf("finish signal - write loop: %d\n", lb->finish_signal);
