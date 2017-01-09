@@ -70,6 +70,7 @@ u_int64_t threshold_min = 1500, threshold_max = 2500; /* TODO parameters */
 u_int64_t threshold_min_count = 0, threshold_max_count = 0;
 
 volatile u_int64_t *pulse_timestamp_ns;
+volatile u_int64_t *pulse_timestamp_ns_n;
 
 /* lock buffer */
 #include "lock_buffer.c"
@@ -92,6 +93,7 @@ void *time_pulse_thread(void *data) {
   while (likely(!do_shutdown)) {
     /* clock_gettime takes up to 30 nsec to get the time */
     clock_gettime(CLOCK_REALTIME, &tn);
+    if (append_timestamp) *pulse_timestamp_ns_n = ((u_int64_t) ((u_int64_t) htonl(tn.tv_sec) << 32) | htonl(tn.tv_nsec));
     *pulse_timestamp_ns = ((u_int64_t) ((u_int64_t) tn.tv_sec * 1000000000) + tn.tv_nsec);
   }
 
@@ -411,6 +413,8 @@ int main(int argc, char* argv[]) {
   puts("NOT using burst API :(");
   #endif
   puts("should have printed something..?");
+  pulse_timestamp_ns_n = calloc(CACHE_LINE_LEN/sizeof(u_int64_t), sizeof(u_int64_t));
+  if (append_timestamp) while (!*pulse_timestamp_ns_n && !do_shutdown); /* wait for ts */
 
   pthread_create(&my_thread, NULL, packet_consumer_thread, (void*) NULL);
 
