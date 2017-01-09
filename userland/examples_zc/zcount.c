@@ -410,6 +410,7 @@ int main(int argc, char* argv[]) {
   #else
   puts("NOT using burst API :(");
   #endif
+  puts("should have printed something..?");
 
   pthread_create(&my_thread, NULL, packet_consumer_thread, (void*) NULL);
 
