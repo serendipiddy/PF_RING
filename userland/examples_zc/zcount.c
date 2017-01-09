@@ -402,8 +402,10 @@ int main(int argc, char* argv[]) {
 
   if (time_pulse) {
     pulse_timestamp_ns = calloc(CACHE_LINE_LEN/sizeof(u_int64_t), sizeof(u_int64_t));
+    pulse_timestamp_ns_n = calloc(CACHE_LINE_LEN/sizeof(u_int64_t), sizeof(u_int64_t));
     pthread_create(&time_thread, NULL, time_pulse_thread, NULL);
     while (!*pulse_timestamp_ns && !do_shutdown); /* wait for ts */
+    while (!*pulse_timestamp_ns_n && !do_shutdown);
   }
   
   /* lock buffer code */
@@ -413,8 +415,6 @@ int main(int argc, char* argv[]) {
   puts("NOT using burst API :(");
   #endif
   puts("should have printed something..?");
-  pulse_timestamp_ns_n = calloc(CACHE_LINE_LEN/sizeof(u_int64_t), sizeof(u_int64_t));
-  if (append_timestamp) while (!*pulse_timestamp_ns_n && !do_shutdown); /* wait for ts */
 
   pthread_create(&my_thread, NULL, packet_consumer_thread, (void*) NULL);
 
