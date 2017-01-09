@@ -76,6 +76,12 @@ volatile u_int64_t *pulse_timestamp_ns;
 u_char use_lock_buffer = 0; 
 struct lock_buffer * lb_buffer;
 
+static inline void get_packet_timestamp(struct id_time * it) {
+    u_int64_t ts = *pulse_timestamp_ns_n;
+    it->sec  = ts >> 32; 
+    it->nsec = ts & 0xffffffff;
+}
+
 /* ******************************** */
 
 void *time_pulse_thread(void *data) {
@@ -397,6 +403,13 @@ int main(int argc, char* argv[]) {
     pthread_create(&time_thread, NULL, time_pulse_thread, NULL);
     while (!*pulse_timestamp_ns && !do_shutdown); /* wait for ts */
   }
+  
+  /* lock buffer code */
+  #ifndef USE_BURST_API
+  puts("using burst API.. *phew*");
+  #else
+  puts("NOT using burst API :(");
+  #endif
 
   pthread_create(&my_thread, NULL, packet_consumer_thread, (void*) NULL);
 
