@@ -93,7 +93,7 @@ void *time_pulse_thread(void *data) {
   while (likely(!do_shutdown)) {
     /* clock_gettime takes up to 30 nsec to get the time */
     clock_gettime(CLOCK_REALTIME, &tn);
-    if (append_timestamp) *pulse_timestamp_ns_n = ((u_int64_t) ((u_int64_t) htonl(tn.tv_sec) << 32) | htonl(tn.tv_nsec));
+    *pulse_timestamp_ns_n = ((u_int64_t) ((u_int64_t) htonl(tn.tv_sec) << 32) | htonl(tn.tv_nsec));
     *pulse_timestamp_ns = ((u_int64_t) ((u_int64_t) tn.tv_sec * 1000000000) + tn.tv_nsec);
   }
 
