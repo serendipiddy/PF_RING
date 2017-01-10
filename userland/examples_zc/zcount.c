@@ -430,6 +430,7 @@ int main(int argc, char* argv[]) {
   signal(SIGINT,  sigproc);
 
   if (time_pulse) {
+    puts("timepulse active");
     pulse_timestamp_ns = calloc(CACHE_LINE_LEN/sizeof(u_int64_t), sizeof(u_int64_t));
     pulse_timestamp_ns_n = calloc(CACHE_LINE_LEN/sizeof(u_int64_t), sizeof(u_int64_t));
     pthread_create(&time_thread, NULL, time_pulse_thread, NULL);

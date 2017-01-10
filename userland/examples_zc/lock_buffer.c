@@ -40,7 +40,7 @@ void lock_buffer_init (struct lock_buffer * lb, size_t elem_size, size_t item_nu
     int i;
     item_num = abs(item_num);
     
-    printf("  Init lock buffer, item size: %d num: %d \n", elem_size, item_num);
+    // printf("  Init lock buffer, item size: %d num: %d \n", elem_size, item_num);
     
     // init the locks in the array
     lb->locks = malloc( sizeof(pthread_mutex_t) * NUMBER_OF_LOCKS );// malloc the lock array
