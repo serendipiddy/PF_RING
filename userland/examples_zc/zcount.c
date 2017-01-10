@@ -410,11 +410,10 @@ int main(int argc, char* argv[]) {
   
   /* lock buffer code */
   #ifndef USE_BURST_API
-  puts("using burst API.. *phew*");
+  puts("using burst API");
   #else
-  puts("NOT using burst API :(");
+  puts(" ### NOT using burst API :( ### ");
   #endif
-  puts("should have printed something..?");
 
   pthread_create(&my_thread, NULL, packet_consumer_thread, (void*) NULL);
 
