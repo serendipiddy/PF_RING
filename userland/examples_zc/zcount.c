@@ -438,7 +438,7 @@ int main(int argc, char* argv[]) {
   if (use_lock_buffer) 
   {
       unsigned int sample_secs = pps * 20;  // 4 minutes of data
-      printf("sample secs: %d\n", sample_secs);
+      // printf("sample secs: %d\n", sample_secs);
       lb_buffer = lock_buffer_create(pps, sizeof(struct id_time), sample_secs);
       pthread_create( &buffer_write_thread_id, NULL, lock_buffer_write_loop, lb_buffer);
       lock_buffer_log_fp = fopen(lock_buffer_filename, "w+b"); 
@@ -447,21 +447,21 @@ int main(int argc, char* argv[]) {
 
   pthread_create(&my_thread, NULL, packet_consumer_thread, (void*) NULL);
 
-  // if (!verbose) while (!do_shutdown) {
-    // if (high_stats_refresh) {
-      // pfring_zc_stat stats;
-      // pfring_zc_stats(zq, &stats);
-      // gettimeofday(&timeNow, NULL);
-      // if (timeNow.tv_sec != lastTime.tv_sec) {
-        // lastTime.tv_sec = timeNow.tv_sec;
-        // print_stats();
-      // }
-      // usleep(1);
-    // } else {
-      // sleep(ALARM_SLEEP);
-      // print_stats();
-    // }
-  // }
+  if (!verbose) while (!do_shutdown) {
+    if (high_stats_refresh) {
+      pfring_zc_stat stats;
+      pfring_zc_stats(zq, &stats);
+      gettimeofday(&timeNow, NULL);
+      if (timeNow.tv_sec != lastTime.tv_sec) {
+        lastTime.tv_sec = timeNow.tv_sec;
+        print_stats();
+      }
+      usleep(1);
+    } else {
+      sleep(ALARM_SLEEP);
+      print_stats();
+    }
+  }
 
   pthread_join(my_thread, NULL);
 

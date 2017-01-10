@@ -40,7 +40,7 @@ void lock_buffer_init (struct lock_buffer * lb, size_t elem_size, size_t item_nu
     int i;
     item_num = abs(item_num);
     
-    printf("  Init lock buffer, item size: %d num: %d \n", elem_size, item_num);
+    // printf("  Init lock buffer, item size: %d num: %d \n", elem_size, item_num);
     
     // init the locks in the array
     lb->locks = malloc( sizeof(pthread_mutex_t) * NUMBER_OF_LOCKS );// malloc the lock array
@@ -156,13 +156,13 @@ void * lock_buffer_write_loop( void * x ) { // struct lock_buffer * lb) {
     
     printf("write loop starting, lock step: %d num in buffer: %d\n", lb->lock_step, lb->item_num);
     
-    printf("location of lb - write loop: 0x%X\n", lb->buffer);
+    // printf("location of lb - write loop: 0x%X\n", lb->buffer);
     // printf("location of lbs: 0x%X start: 0x%X end: 0x%X\n", lbs, lbs->start, lbs->end);
     int writes = 0;
     // printf("finish signal - write loop: %d\n", lb->finish_signal);
     lock_buffer_pull(lb, lbs);
     while (!lb->finish_signal) {
-        printf("WRITE: start: 0x%X  end: 0x%X\n",lbs->start, lbs->end);
+        // printf("WRITE: start: 0x%X  end: 0x%X\n",lbs->start, lbs->end);
         fwrite(lbs->start, sizeof(struct id_time), lbs->end - lbs->start, lock_buffer_log_fp);
         writes++;
         lock_buffer_pull(lb, lbs);
