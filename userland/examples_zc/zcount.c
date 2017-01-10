@@ -76,6 +76,7 @@ volatile u_int64_t *pulse_timestamp_ns_n;
 #include "lock_buffer.c"
 u_char use_lock_buffer = 0; 
 struct lock_buffer * lb_buffer;
+int pps = -1;
 
 static inline void get_packet_timestamp(struct id_time * it) {
     u_int64_t ts = *pulse_timestamp_ns_n;
@@ -328,7 +329,10 @@ int main(int argc, char* argv[]) {
       print_maintenance = 1;
       break;
     case 'X':
+      use_lock_buffer = 1;
       lock_buffer_filename = strdup(optarg);
+    case 'p':
+      pps = atoi(optarg);
     }
   }
   
