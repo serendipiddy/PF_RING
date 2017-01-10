@@ -92,6 +92,8 @@ static inline void get_packet_timestamp(struct id_time * it) {
 
 void *time_pulse_thread(void *data) {
   struct timespec tn;
+  
+  puts("running time pulse thread");
 
   bind2core(bind_time_pulse_core);
 
