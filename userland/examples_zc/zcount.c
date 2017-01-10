@@ -234,6 +234,13 @@ void *packet_consumer_thread(void *user) {
 #ifndef USE_BURST_API
     if(pfring_zc_recv_pkt(zq, &buffers[lru], wait_for_packet) > 0) {
 
+      if (use_lock_buffer)
+      {
+          lb_it->id++;
+          get_packet_timestamp(lb_it);
+          lock_buffer_push (lb_buffer, lb_it); 
+      }
+    
       if (unlikely(time_pulse)) {
         u_int64_t now_ns = *pulse_timestamp_ns;
         u_int64_t diff_ns = now_ns - prev_ns;
@@ -414,6 +421,15 @@ int main(int argc, char* argv[]) {
   #else
   puts(" ### NOT using burst API :( ### ");
   #endif
+  
+  if (use_lock_buffer) 
+  {
+      unsigned int sample_secs = pps * 240;  // 4 minutes of data
+      lb_buffer = lock_buffer_create(pps, sizeof(struct id_time), sample_secs);
+      pthread_create( &buffer_write_thread_id, NULL, lock_buffer_write_loop, lb_buffer);
+      lock_buffer_log_fp = fopen(lock_buffer_filename, "w+b"); 
+      puts("Lock buffer thread created and file opened");
+  }
 
   pthread_create(&my_thread, NULL, packet_consumer_thread, (void*) NULL);
 
