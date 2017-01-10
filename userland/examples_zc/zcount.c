@@ -79,13 +79,9 @@ struct lock_buffer * lb_buffer;
 int pps = -1;
 
 static inline void get_packet_timestamp(struct id_time * it) {
-    puts("getting ts");
     u_int64_t ts = *pulse_timestamp_ns_n;
-    puts("ts = pulse");
     it->sec  = ts >> 32; 
-    puts(">> 32");
     it->nsec = ts & 0xffffffff;
-    puts("done");
 }
 
 /* ******************************** */
@@ -93,8 +89,6 @@ static inline void get_packet_timestamp(struct id_time * it) {
 void *time_pulse_thread(void *data) {
   struct timespec tn;
   
-  puts("running time pulse thread");
-
   bind2core(bind_time_pulse_core);
 
   while (likely(!do_shutdown)) {
@@ -245,19 +239,12 @@ void *packet_consumer_thread(void *user) {
 #ifndef USE_BURST_API
     if(pfring_zc_recv_pkt(zq, &buffers[lru], wait_for_packet) > 0) {
 
-     
-      puts("packet arrived");
-     
       if (use_lock_buffer)
       {
           lb_it->id++;
-          puts("incremented id");
           get_packet_timestamp(lb_it);
-          puts("got timestamp");
           lock_buffer_push (lb_buffer, lb_it); 
-          puts("pushed it");
       }
-      puts("passed lb");
     
       if (unlikely(time_pulse)) {
         u_int64_t now_ns = *pulse_timestamp_ns;
