@@ -157,7 +157,7 @@ void * lock_buffer_write_loop( void * x ) { // struct lock_buffer * lb) {
     printf("write loop starting, lock step: %d num in buffer: %d\n", lb->lock_step, lb->item_num);
     
     printf("location of lb - write loop: 0x%X\n", lb->buffer);
-    printf("location of lbs: 0x%X start: 0x%X end: 0x%X\n", lbs, lbs->start, lbs->end);
+    // printf("location of lbs: 0x%X start: 0x%X end: 0x%X\n", lbs, lbs->start, lbs->end);
     int writes = 0;
     // printf("finish signal - write loop: %d\n", lb->finish_signal);
     lock_buffer_pull(lb, lbs);
