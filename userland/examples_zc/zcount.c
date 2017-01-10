@@ -286,6 +286,7 @@ int main(int argc, char* argv[]) {
   pthread_t my_thread;
   struct timeval timeNow, lastTime;
   pthread_t time_thread;
+  pthread_t buffer_write_thread_id; /* lock buffer */
 
   lastTime.tv_sec = 0;
   startTime.tv_sec = 0;
