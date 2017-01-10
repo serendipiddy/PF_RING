@@ -79,9 +79,13 @@ struct lock_buffer * lb_buffer;
 int pps = -1;
 
 static inline void get_packet_timestamp(struct id_time * it) {
+    puts("getting ts");
     u_int64_t ts = *pulse_timestamp_ns_n;
+    puts("ts = pulse");
     it->sec  = ts >> 32; 
+    puts(">> 32");
     it->nsec = ts & 0xffffffff;
+    puts("done");
 }
 
 /* ******************************** */
