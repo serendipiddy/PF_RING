@@ -239,12 +239,19 @@ void *packet_consumer_thread(void *user) {
 #ifndef USE_BURST_API
     if(pfring_zc_recv_pkt(zq, &buffers[lru], wait_for_packet) > 0) {
 
+     
+      puts("packet arrived");
+     
       if (use_lock_buffer)
       {
           lb_it->id++;
+          puts("incremented id");
           get_packet_timestamp(lb_it);
+          puts("got timestamp");
           lock_buffer_push (lb_buffer, lb_it); 
+          puts("pushed it");
       }
+      puts("passed lb");
     
       if (unlikely(time_pulse)) {
         u_int64_t now_ns = *pulse_timestamp_ns;
