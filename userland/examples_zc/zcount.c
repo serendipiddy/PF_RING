@@ -336,8 +336,10 @@ int main(int argc, char* argv[]) {
     case 'X':
       use_lock_buffer = 1;
       lock_buffer_filename = strdup(optarg);
+      break;
     case 'p':
       pps = atoi(optarg);
+      break;
     }
   }
   
