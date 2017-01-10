@@ -40,7 +40,7 @@ void lock_buffer_init (struct lock_buffer * lb, size_t elem_size, size_t item_nu
     int i;
     item_num = abs(item_num);
     
-    // printf("  Init lock buffer, item size: %d num: %d \n", elem_size, item_num);
+    printf("  Init lock buffer, item size: %d num: %d \n", elem_size, item_num);
     
     // init the locks in the array
     lb->locks = malloc( sizeof(pthread_mutex_t) * NUMBER_OF_LOCKS );// malloc the lock array
@@ -97,9 +97,9 @@ void lock_buffer_pull (struct lock_buffer * lb, struct lock_buffer_section* lbs)
     // wait for next unlock
     // printf("  Attempt to pull items from buffer - lock: 0x%X\n", &lb->locks[ lb->pos_lock_pull ] );
     pthread_mutex_lock( &lb->locks[ lb->pos_lock_pull++ ] );
-    printf("  ** (pull) UNLOCKED! - lock: 0x%X\n", &lb->locks[ lb->pos_lock_pull-1 ] );
+    // printf("  ** (pull) UNLOCKED! - lock: 0x%X\n", &lb->locks[ lb->pos_lock_pull-1 ] );
     if (lb->finish_signal) {
-        printf("  **     BUT FINISHED - lock: 0x%X\n", &lb->locks[ lb->pos_lock_pull-1 ] );
+        // printf("  **     BUT FINISHED - lock: 0x%X\n", &lb->locks[ lb->pos_lock_pull-1 ] );
         return;
     }
     
