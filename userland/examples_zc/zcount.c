@@ -77,6 +77,7 @@ volatile u_int64_t *pulse_timestamp_ns_n;
 u_char use_lock_buffer = 0; 
 struct lock_buffer * lb_buffer;
 int pps = -1;
+int use_hardware = 0;
 
 static inline void get_packet_timestamp(struct id_time * it) {
     u_int64_t ts = *pulse_timestamp_ns_n;
@@ -195,6 +196,7 @@ void printHelp(void) {
   printf("-R              Test hw filters adding a rule (Intel 82599)\n");
   printf("-H              High stats refresh rate (workaround for drop counter on 1G Intel cards)\n");
   printf("-S <core id>    Pulse-time thread for inter-packet time check\n");
+  printf("-s              Use hardware timestamps\n");
   printf("-C              Check license\n");
   printf("-v              Verbose\n");
   printf("-X <filename>   Log file name for timestamps of packets captured\n");
@@ -303,7 +305,7 @@ int main(int argc, char* argv[]) {
   lastTime.tv_sec = 0;
   startTime.tv_sec = 0;
 
-  while((c = getopt(argc,argv,"ac:g:hi:vCRHS:X:p:")) != '?') {
+  while((c = getopt(argc,argv,"ac:g:hi:vCRHS:X:p:s")) != '?') {
     if((c == 255) || (c == -1)) break;
 
     switch(c) {
@@ -343,6 +345,9 @@ int main(int argc, char* argv[]) {
       use_lock_buffer = 1;
       lock_buffer_filename = strdup(optarg);
       break;
+    case 's':
+      use_hardware = 1;
+      break;
     case 'p':
       pps = atoi(optarg);
       break;
@@ -372,7 +377,9 @@ int main(int argc, char* argv[]) {
   }
 
   // zq = pfring_zc_open_device(zc, device, rx_only, 0);
-  zq = pfring_zc_open_device(zc, device, rx_only, PF_RING_ZC_DEVICE_HW_TIMESTAMP);
+  int flags = 0;
+  if (use_hardware) flags += PF_RING_ZC_DEVICE_HW_TIMESTAMP;
+  zq = pfring_zc_open_device(zc, device, rx_only, flags);
 
   if(zq == NULL) {
     fprintf(stderr, "pfring_zc_open_device error [%s] Please check that %s is up and not already used\n",
