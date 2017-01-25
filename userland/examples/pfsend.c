@@ -542,6 +542,7 @@ int main(int argc, char* argv[]) {
       break;
     case 's':
       use_hardware = 1;
+      break;
     case 'e':
       sscanf(optarg, "%lf", &mean_packet_delay);
       sscanf(optarg, "%lf", &mean_packet_delay_live);
