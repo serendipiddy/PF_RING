@@ -869,7 +869,7 @@ int main(int argc, char* argv[]) {
       // rc = pfring_send(pd, (char *) tosend->pkt, tosend->len, pps < 0 ? 1 : 0 /* Don't flush (it does PF_RING automatically) */);
       // rc = pfring_send(pd, (char *) tosend->pkt, tosend->len, 1);
 
-    printf("#%d %du.%du", id++, ts->tn.tv_sec, ts->tn.tv_nsec);
+    printf("#%d %du.%du", id++, ts.tv_sec, ts.tv_nsec);
 
     if (unlikely(verbose))
       printf("[%d] pfring_send(%d) returned %d\n", i, tosend->len, rc);
