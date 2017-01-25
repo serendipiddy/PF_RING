@@ -459,7 +459,7 @@ int main(int argc, char* argv[]) {
   srcaddr.s_addr = 0x0000000A /* 10.0.0.0 */;
   dstaddr.s_addr = 0x0100A8C0 /* 192.168.0.1 */;
 
-  while((c = getopt(argc, argv, "b:dD:hi:n:g:l:o:Oaf:r:vm:p:P:S:w:x:ze:E:")) != -1) {
+  while((c = getopt(argc, argv, "b:dD:hi:n:g:l:o:Oaf:r:vm:p:P:S:w:x:ze:E:s")) != -1) {
     switch(c) {
     case 'b':
       num_balanced_pkts = atoi(optarg);
@@ -574,6 +574,7 @@ int main(int argc, char* argv[]) {
 
   int flags = 0 /* PF_RING_PROMISC */;
   if (use_hardware) {
+    puts("enabling hardware timestamps");
     flags += PF_RING_HW_TIMESTAMP;
   }
   pd = pfring_open(device, 1500, flags);
