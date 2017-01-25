@@ -36,11 +36,12 @@ struct lock_buffer_section {
 };
 
 # define NUMBER_OF_LOCKS 2
+# define MAX_ITEMS_TO_BUFFER 100000
 void lock_buffer_init (struct lock_buffer * lb, size_t elem_size, size_t item_num) {
     int i;
     item_num = abs(item_num);
     
-    printf("  Init lock buffer, item size: %d num: %d \n", elem_size, item_num);
+    // printf("  Init lock buffer, item size: %d num: %d \n", elem_size, item_num);
     
     // init the locks in the array
     lb->locks = malloc( sizeof(pthread_mutex_t) * NUMBER_OF_LOCKS );// malloc the lock array
@@ -140,6 +141,7 @@ void lock_buffer_finish (struct lock_buffer *lb) {
  */
 struct lock_buffer * lock_buffer_create (int pkt_rate, int data_size, int seconds) {
     int items_to_buffer = pkt_rate * seconds;
+    if (items_to_buffer > MAX_ITEMS_TO_BUFFER) items_to_buffer = MAX_ITEMS_TO_BUFFER
     // printf("## Creating buffer of size %d\n", items_to_buffer);
     
     struct lock_buffer * lb = malloc( sizeof(struct lock_buffer) );
