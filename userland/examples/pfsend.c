@@ -259,6 +259,7 @@ void printHelp(void) {
   printf("-D <ip>         Use <ip> as destination IP in -b\n");
   printf("-O              On the fly reforging instead of preprocessing (-b)\n");
   printf("-z              Randomize generated IPs sequence\n");
+  printf("-s              Enable hardware timestamps\n");
   printf("-o <num>        Offset for generated IPs (-b) or packets in pcap (-f)\n");
   printf("-w <watermark>  TX watermark (low value=low latency) [not effective on ZC]\n");
   printf("-x <if index>   Send to the selected interface, if supported\n");
@@ -439,6 +440,7 @@ int main(int argc, char* argv[]) {
   int randomize = 0;
   int reforging_idx;
   int stdin_packet_len = 0;
+  int use_hardware = 0;
   
   /* Exponentially distributed inter-packet delay stuff */
   u_int64_t ticks_to_wait = 0; 
@@ -538,6 +540,8 @@ int main(int argc, char* argv[]) {
     case 'z':
       randomize = 1;
       break;
+    case 's':
+      use_hardware = 1;
     case 'e':
       sscanf(optarg, "%lf", &mean_packet_delay);
       sscanf(optarg, "%lf", &mean_packet_delay_live);
@@ -568,7 +572,11 @@ int main(int argc, char* argv[]) {
 
   printf("Sending packets on %s\n", device);
 
-  pd = pfring_open(device, 1500, 0 /* PF_RING_PROMISC */);
+  int flags = 0 /* PF_RING_PROMISC */;
+  if (use_hardware) {
+    flags += PF_RING_HW_TIMESTAMP;
+  }
+  pd = pfring_open(device, 1500, flags);
   if(pd == NULL) { /* Print PR_RING version information (Or exit if pd == null) */
     printf("pfring_open error [%s] (pf_ring not loaded or interface %s is down ?)\n", 
            strerror(errno), device);
