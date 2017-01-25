@@ -641,6 +641,16 @@ void *send_traffic(void *user) {
         if (unlikely(do_shutdown)) break;
         if (!active) usleep(1);
       }
+
+      if (use_lock_buffer)
+      {
+          lb_it->id;
+          lb_it->sec  = bswap_32(buffers[buffer_id]->ts.tv_sec);
+          lb_it->nsec = bswap_32(buffers[buffer_id]->ts.tv_nsec);
+          lock_buffer_push (lb_buffer, lb_it); 
+      }
+
+
       
       /* Test time stamp for *after* the packet has been sent */
       // if (use_lock_buffer)
