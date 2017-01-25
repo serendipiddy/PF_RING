@@ -245,6 +245,12 @@ void *packet_consumer_thread(void *user) {
           lb_it->id++;
           get_packet_timestamp(lb_it);
           lock_buffer_push (lb_buffer, lb_it); 
+          
+          /* get timestamp from packet instead */
+          lb_it->sec = buffer->ts.tv_sec
+          lb_it->nsec = buffer->ts.tv_nsec
+
+          lock_buffer_push (lb_buffer, lb_it); 
       }
     
       if (unlikely(time_pulse)) {
