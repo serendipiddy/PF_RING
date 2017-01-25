@@ -917,7 +917,7 @@ int main(int argc, char* argv[]) {
     /* wait until it's time to send next packet */
     // puts("here?")
     if(pps > 0) {
-      // puts("here in pps?")
+      puts("here in pps?")
       /* getticks() is in assembly, timestep count storing timestamp on cpu (skips normal tlinux time) pfutils.c:256 */
       /* rate set */
       if (mean_packet_delay >= 0) {
