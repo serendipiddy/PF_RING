@@ -707,3 +707,256 @@ int main(int argc, char* argv[]) {
       if (num_pcap_pkts == 0) {
         printf("Pcap file %s is empty\n", pcap_in);
         pfring_close(pd);
+        return(-1);
+      }
+
+      /* at this point avg_send_len is the sum of the packet lengths, dividing below makes it's name valid */
+      avg_send_len /= num_pcap_pkts; 
+
+      pcap_close(pt);
+      printf("Read %d packets from pcap file %s\n",
+            num_pcap_pkts, pcap_in);
+      last->next = pkt_head; /* Loop linked list back on itself */
+      send_len = avg_send_len;
+
+      if (send_full_pcap_once)
+        num_to_send = num_pcap_pkts;
+    } else {
+      printf("Unable to open file %s\n", pcap_in);
+      pfring_close(pd);
+      return(-1);
+    } /* end of pcap file processing */
+  } 
+  else { /* this isn't using a pcap file, so need to generate the packets */
+    struct packet *p = NULL, *last = NULL; /* initialise the packet linked list structure */
+
+    /* if user defined the packet contents from stdin, override the packet length to be that length */
+    if ((stdin_packet_len = read_packet_hex(buffer, sizeof(buffer))) > 0) {
+      send_len = stdin_packet_len;
+    }
+
+    for (i = 0; i < num_balanced_pkts; i++) {
+
+      if (stdin_packet_len <= 0) { /* create the packet data */
+        forge_udp_packet(buffer, send_len, pkts_offset + i); /* src IP address will increase by 1 each forged packet */
+      } else {
+        if (reforge_packet(buffer, send_len, pkts_offset + i, 0) != 0) { 
+          fprintf(stderr, "Unable to reforge the provided packet\n");
+          return -1;
+        }
+      }
+
+      p = (struct packet *) malloc(sizeof(struct packet));
+      if (p == NULL) { 
+        fprintf(stderr, "Unable to allocate memory requested (%s)\n", strerror(errno));
+        return (-1);
+      }
+
+      if (i == 0) pkt_head = p; /* set head of packet linked list */
+
+      p->len = send_len;
+      p->ticks_from_beginning = 0;
+      p->next = pkt_head;
+      p->pkt = (u_char *) malloc(p->len);
+
+      if (p->pkt == NULL) {
+        fprintf(stderr, "Unable to allocate memory requested (%s)\n", strerror(errno));
+        return (-1);
+      }
+
+      /* copy the generated packet into the linked list to send */
+      memcpy(p->pkt, buffer, send_len);
+
+      /* move to the next position in the linked list */
+      if (last != NULL) last->next = p;
+      last = p;
+
+      if (on_the_fly_reforging) {
+#if 0
+        if (stdin_packet_len <= 0) { /* forge_udp_packet, parsing packet for on the fly reforing */
+          memset(&hdr, 0, sizeof(hdr));
+          hdr.len = hdr.caplen = p->len;
+          if (pfring_parse_pkt(p->pkt, &hdr,  /* level */ 4, /* don't add timestamp */ 0, /* don't add hash */ 0) < 3) { /* returns the level parsed up until */
+            fprintf(stderr, "Unable to reforge the packet (unexpected)\n");
+            return -1; 
+          }
+        }
+#endif
+        break;
+      }
+    }
+  }
+
+  /* Set the packet sent rate (tick_delta) */
+#if !(defined(__arm__) || defined(__mips__))
+  if(gbit_s > 0) {
+    /* computing max rate (convert Gbps to pps) */
+    double byte_s = (gbit_s * 1000000000) / 8; /* convert Gbit/s to byte/s */
+    pps = ( byte_s ) / (8 /*Preamble*/ + send_len /* the packet */ + 4 /*CRC*/ + 12 /*InterFrameGap*/);
+  } else if (gbit_s < 0) {
+    /* capture rate */
+    pps = -1;
+  } /* else use pps */
+
+  if (pps > 0) {
+    td = (double) (hz / pps); /* set inter-packet tick delta */
+    tick_delta = (ticks)td;
+
+    if (gbit_s > 0)
+      printf("Rate set to %.2f Gbit/s, %d-byte packets, %.2f pps\n", gbit_s, (send_len + 4 /*CRC*/), pps);
+    else
+      printf("Rate set to %.2f pps\n", pps);
+  }
+  
+  if (mean_packet_delay >= 0) {
+      printf("Rate set to %.4f Gbit/s, %d-byte packets, %.2f pps\n", ((send_len+4)*pps/1000000000), (send_len + 4), pps);
+  }
+#endif
+
+  /* Ready PF_RING for sending */
+  if(bind_core >= 0)
+    bind2core(bind_core);
+
+  if(wait_for_packet && (cpu_percentage > 0)) {
+    if(cpu_percentage > 99) cpu_percentage = 99;
+    pfring_config(cpu_percentage);
+  }
+
+  if(!verbose) {
+    signal(SIGALRM, my_sigalarm);
+    alarm(1);
+  }
+
+  gettimeofday(&startTime, NULL);
+  memcpy(&lastTime, &startTime, sizeof(startTime));
+
+  pfring_set_socket_mode(pd, send_only_mode);
+
+  if(pfring_enable_ring(pd) != 0) {
+    printf("Unable to enable ring :-(\n");
+    pfring_close(pd);
+    return(-1);
+  }
+
+  tosend = pkt_head;
+  i = 0;
+  reforging_idx = pkts_offset;
+
+  pfring_set_application_stats(pd, "Statistics not yet computed: please try again...");
+  if(pfring_get_appl_stats_file_name(pd, path, sizeof(path)) != NULL)
+    fprintf(stderr, "Dumping statistics on %s\n", path);
+
+#if !(defined(__arm__) || defined(__mips__))
+  if(pps != 0)
+    tick_start = getticks();
+#endif
+
+  /* timestamp code */
+  struct timespec ts;
+  int id__ = 0;
+
+  while((num_to_send == 0) 
+        || (i < num_to_send)) {
+    int rc;
+
+    redo:
+
+    if (unlikely(do_shutdown)) 
+      break;
+
+    if (on_the_fly_reforging) {
+      if (stdin_packet_len <= 0)
+        forge_udp_packet(tosend->pkt, tosend->len, reforging_idx + num_pkt_good_sent);
+      else
+        reforge_packet(tosend->pkt, tosend->len, reforging_idx + num_pkt_good_sent, 1); 
+    }
+
+    if (if_index != -1)
+      rc = pfring_send_ifindex(pd, (char *) tosend->pkt, tosend->len, pps < 0 ? 1 : 0 /* Don't flush (it does PF_RING automatically) */, if_index);
+      // rc = pfring_send_ifindex(pd, (char *) tosend->pkt, tosend->len, 1, if_index);
+    else {
+      rc = pfring_send_get_time(pd, (char *) tosend->pkt,  tosend->len, &ts);
+      // rc = pfring_send(pd, (char *) tosend->pkt, tosend->len, pps < 0 ? 1 : 0 /* Don't flush (it does PF_RING automatically) */);
+      // rc = pfring_send(pd, (char *) tosend->pkt, tosend->len, 1);
+      printf("#%d %d %X.%X %d\n", id__++, i, ts.tv_sec, ts.tv_nsec, num_to_send);
+    }
+
+
+    if (unlikely(verbose))
+      printf("[%d] pfring_send(%d) returned %d\n", i, tosend->len, rc);
+
+    if (rc == PF_RING_ERROR_INVALID_ARGUMENT) {
+      if (send_error_once) {
+        printf("Attempting to send invalid packet [len: %u][MTU: %u]%s\n",
+            tosend->len, pd->mtu_len,
+            if_index != -1 ? " or using a wrong interface id" : "");
+        send_error_once = 0;
+      }
+    } 
+    else if (rc < 0) {
+      /* Not enough space in buffer */
+      if(!active_poll)
+        usleep(1);
+      goto redo;
+    } else {
+      num_pkt_good_sent++;
+      num_bytes_good_sent += tosend->len + 24 /* 8 Preamble + 4 CRC + 12 IFG */;
+    }
+
+    if (randomize) { /* Randomise IP address sequence */
+      n = random() & 0xF;
+      if (on_the_fly_reforging)
+        reforging_idx += n;
+      else
+        for (j = 0; j < n; j++)
+          tosend = tosend->next;
+    }
+    tosend = tosend->next;
+
+#if !(defined(__arm__) || defined(__mips__))
+    /* wait until it's time to send next packet */
+    // puts("here?")
+    if(pps > 0) {
+      puts("here in pps?");
+      /* getticks() is in assembly, timestep count storing timestamp on cpu (skips normal tlinux time) pfutils.c:256 */
+      /* rate set */
+      if (mean_packet_delay >= 0) {
+        // printf("%lu", tick_start + ticks_to_wait);
+        if (mean_packet_delay_delta >= 0) {
+            mean_packet_delay_live = mean_packet_delay + mean_packet_delay_delta * (ticks_to_wait/hz);
+        }
+        
+        /* RNG doesn't delay transmission, as ticks continue in background :) */
+        exp_delay = get_exponential_val(mean_packet_delay);
+        tick_delta =(ticks)( (double) hz * exp_delay );
+        ticks_to_wait =  ticks_to_wait + tick_delta;
+      }
+      else {
+        ticks_to_wait = num_pkt_good_sent * tick_delta;
+      }
+      while((getticks() - tick_start) < ticks_to_wait)
+        if (unlikely(do_shutdown)) break;
+    } 
+    else if (pps < 0) {
+      /* real pcap rate */
+      if (tosend->ticks_from_beginning == 0)
+        tick_start = getticks(); 
+      while((getticks() - tick_start) < tosend->ticks_from_beginning) /* get delta from pcap file */
+        if (unlikely(do_shutdown)) break;
+    }
+#endif
+
+    if(num_to_send > 0) i++;
+  } /* while packets to send */
+
+  print_stats();
+  printf("Sent %llu packets\n", (long long unsigned int) num_pkt_good_sent);
+
+  pfring_close(pd);
+
+  if (pidFileName)
+    remove_pid_file(pidFileName);
+
+  return(0);
+}
+
