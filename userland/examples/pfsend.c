@@ -894,7 +894,7 @@ int main(int argc, char* argv[]) {
       }
     } 
     else if (rc == PF_RING_ERROR_NOT_SUPPORTED) {
-        printf("PF_RING_ERROR_NOT_SUPPORTED on send");
+        printf("PF_RING_ERROR_NOT_SUPPORTED on send\n");
         break;
     }
     else if (rc < 0) {
