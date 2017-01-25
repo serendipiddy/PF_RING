@@ -297,7 +297,7 @@ int main(int argc, char* argv[]) {
   lastTime.tv_sec = 0;
   startTime.tv_sec = 0;
 
-  while((c = getopt(argc,argv,"ac:g:hi:vCRHS:X:")) != '?') {
+  while((c = getopt(argc,argv,"ac:g:hi:vCRHS:X:p:")) != '?') {
     if((c == 255) || (c == -1)) break;
 
     switch(c) {
