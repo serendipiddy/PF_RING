@@ -96,6 +96,7 @@ volatile u_int64_t *pulse_timestamp_ns_n;
 
 /* lock buffer */
 #include "lock_buffer.c"
+#include <byteswap.h>
 u_char use_lock_buffer = 0; 
 struct lock_buffer * lb_buffer;
 int use_hardware = 0;
