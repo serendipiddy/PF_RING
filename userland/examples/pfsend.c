@@ -902,6 +902,7 @@ int main(int argc, char* argv[]) {
       num_pkt_good_sent++;
       num_bytes_good_sent += tosend->len + 24 /* 8 Preamble + 4 CRC + 12 IFG */;
     }
+    puts("no send error?");
 
     if (randomize) { /* Randomise IP address sequence */
       n = random() & 0xF;
