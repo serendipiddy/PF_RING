@@ -833,4 +833,120 @@ int main(int argc, char* argv[]) {
   reforging_idx = pkts_offset;
 
   pfring_set_application_stats(pd, "Statistics not yet computed: please try again...");
-  if(pfring_get_appl_
+  if(pfring_get_appl_stats_file_name(pd, path, sizeof(path)) != NULL)
+    fprintf(stderr, "Dumping statistics on %s\n", path);
+
+#if !(defined(__arm__) || defined(__mips__))
+  if(pps != 0)
+    tick_start = getticks();
+#endif
+
+  /* timestamp code */
+  struct timespec ts;
+  int id = 0;
+
+  while((num_to_send == 0) 
+        || (i < num_to_send)) {
+    int rc;
+
+    redo:
+
+    if (unlikely(do_shutdown)) 
+      break;
+
+    if (on_the_fly_reforging) {
+      if (stdin_packet_len <= 0)
+        forge_udp_packet(tosend->pkt, tosend->len, reforging_idx + num_pkt_good_sent);
+      else
+        reforge_packet(tosend->pkt, tosend->len, reforging_idx + num_pkt_good_sent, 1); 
+    }
+
+    if (if_index != -1)
+      rc = pfring_send_ifindex(pd, (char *) tosend->pkt, tosend->len, pps < 0 ? 1 : 0 /* Don't flush (it does PF_RING automatically) */, if_index);
+      // rc = pfring_send_ifindex(pd, (char *) tosend->pkt, tosend->len, 1, if_index);
+    else {
+      rc = pfring_send_get_time(pd, (char *) tosend->pkt,  tosend->len, &ts);
+      // rc = pfring_send(pd, (char *) tosend->pkt, tosend->len, pps < 0 ? 1 : 0 /* Don't flush (it does PF_RING automatically) */);
+      // rc = pfring_send(pd, (char *) tosend->pkt, tosend->len, 1);
+      printf("#%d %X.%X %d\n", id++, ts.tv_sec, ts.tv_nsec, num_to_send);
+    }
+
+
+    if (unlikely(verbose))
+      printf("[%d] pfring_send(%d) returned %d\n", i, tosend->len, rc);
+
+    if (rc == PF_RING_ERROR_INVALID_ARGUMENT) {
+      if (send_error_once) {
+        printf("Attempting to send invalid packet [len: %u][MTU: %u]%s\n",
+            tosend->len, pd->mtu_len,
+            if_index != -1 ? " or using a wrong interface id" : "");
+        send_error_once = 0;
+      }
+    } 
+    else if (rc < 0) {
+      /* Not enough space in buffer */
+      if(!active_poll)
+        usleep(1);
+      goto redo;
+    } else {
+      num_pkt_good_sent++;
+      num_bytes_good_sent += tosend->len + 24 /* 8 Preamble + 4 CRC + 12 IFG */;
+    }
+
+    if (randomize) { /* Randomise IP address sequence */
+      n = random() & 0xF;
+      if (on_the_fly_reforging)
+        reforging_idx += n;
+      else
+        for (j = 0; j < n; j++)
+          tosend = tosend->next;
+    }
+    tosend = tosend->next;
+
+#if !(defined(__arm__) || defined(__mips__))
+    /* wait until it's time to send next packet */
+    // puts("here?")
+    if(pps > 0) {
+      // puts("here in pps?")
+      /* getticks() is in assembly, timestep count storing timestamp on cpu (skips normal tlinux time) pfutils.c:256 */
+      /* rate set */
+      if (mean_packet_delay >= 0) {
+        // printf("%lu", tick_start + ticks_to_wait);
+        if (mean_packet_delay_delta >= 0) {
+            mean_packet_delay_live = mean_packet_delay + mean_packet_delay_delta * (ticks_to_wait/hz);
+        }
+        
+        /* RNG doesn't delay transmission, as ticks continue in background :) */
+        exp_delay = get_exponential_val(mean_packet_delay);
+        tick_delta =(ticks)( (double) hz * exp_delay );
+        ticks_to_wait =  ticks_to_wait + tick_delta;
+      }
+      else {
+        ticks_to_wait = num_pkt_good_sent * tick_delta;
+      }
+      while((getticks() - tick_start) < ticks_to_wait)
+        if (unlikely(do_shutdown)) break;
+    } 
+    else if (pps < 0) {
+      /* real pcap rate */
+      if (tosend->ticks_from_beginning == 0)
+        tick_start = getticks(); 
+      while((getticks() - tick_start) < tosend->ticks_from_beginning) /* get delta from pcap file */
+        if (unlikely(do_shutdown)) break;
+    }
+#endif
+
+    if(num_to_send > 0) i++;
+  } /* while packets to send */
+
+  print_stats();
+  printf("Sent %llu packets\n", (long long unsigned int) num_pkt_good_sent);
+
+  pfring_close(pd);
+
+  if (pidFileName)
+    remove_pid_file(pidFileName);
+
+  return(0);
+}
+
