@@ -843,7 +843,7 @@ int main(int argc, char* argv[]) {
 
   /* timestamp code */
   struct timespec ts;
-  int id = 0;
+  int id__ = 0;
 
   while((num_to_send == 0) 
         || (i < num_to_send)) {
@@ -868,7 +868,7 @@ int main(int argc, char* argv[]) {
       rc = pfring_send_get_time(pd, (char *) tosend->pkt,  tosend->len, &ts);
       // rc = pfring_send(pd, (char *) tosend->pkt, tosend->len, pps < 0 ? 1 : 0 /* Don't flush (it does PF_RING automatically) */);
       // rc = pfring_send(pd, (char *) tosend->pkt, tosend->len, 1);
-      printf("#%d %X.%X %d\n", id++, ts.tv_sec, ts.tv_nsec, num_to_send);
+      printf("#%d %X.%X %d\n", id__++, ts.tv_sec, ts.tv_nsec, num_to_send);
     }
 
 
