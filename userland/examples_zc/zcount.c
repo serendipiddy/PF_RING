@@ -74,6 +74,7 @@ volatile u_int64_t *pulse_timestamp_ns_n;
 
 /* lock buffer */
 #include "lock_buffer.c"
+#include <byteswap.h>
 u_char use_lock_buffer = 0; 
 struct lock_buffer * lb_buffer;
 int pps = -1;
@@ -249,8 +250,8 @@ void *packet_consumer_thread(void *user) {
           lock_buffer_push (lb_buffer, lb_it); 
           
           /* get timestamp from packet instead */
-          lb_it->sec = buffers[lru]->ts.tv_sec;
-          lb_it->nsec = buffers[lru]->ts.tv_nsec;
+          lb_it->sec =  bswap_32(buffers[lru]->ts.tv_sec);
+          lb_it->nsec = bswap_32(buffers[lru]->ts.tv_nsec);
 
           lock_buffer_push (lb_buffer, lb_it); 
       }
