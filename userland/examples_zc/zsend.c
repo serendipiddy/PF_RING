@@ -98,6 +98,7 @@ volatile u_int64_t *pulse_timestamp_ns_n;
 #include "lock_buffer.c"
 u_char use_lock_buffer = 0; 
 struct lock_buffer * lb_buffer;
+int use_hardware = 0;
 
 static inline void get_packet_timestamp(struct id_time * it) {
     u_int64_t ts = *pulse_timestamp_ns_n;
@@ -390,6 +391,7 @@ void printHelp(void) {
   printf("-S <core id>    Append timestamp to packets, bind time-pulse thread to a core\n");
   printf("-P <core id>    Use a time-pulse thread to control transmission rate, bind the thread to a core\n");
   printf("-z              Use burst API\n");
+  printf("-s              Use hardware timestamps\n");
   printf("-a              Active packet wait\n");
   printf("-Q <sock>       Enable VM support to attach a consumer from a VM (<sock> is a QEMU monitor sockets)\n");
   printf("-X <filename>   Log file name for timestamps of packets captured\n");
@@ -692,7 +694,7 @@ int main(int argc, char* argv[]) {
 
   startTime.tv_sec = 0;
 
-  while((c = getopt(argc,argv,"ab:c:f:g:hi:m:n:o:p:r:l:zN:S:P:Q:X:")) != '?') {
+  while((c = getopt(argc,argv,"ab:c:f:g:hi:m:n:o:p:r:l:zN:S:P:Q:X:s")) != '?') {
     if((c == 255) || (c == -1)) break;
 
     switch(c) {
@@ -773,6 +775,9 @@ int main(int argc, char* argv[]) {
       use_pulse_time = 1;
       bind_time_pulse_core = atoi(optarg);
       break;
+    case 's':
+      use_hardware = 1;
+      break;
     case 'X':
       use_lock_buffer = 1;
       lock_buffer_filename = strdup(optarg);
@@ -834,6 +839,10 @@ int main(int argc, char* argv[]) {
     }
 
     if (device) {
+      if (use_hardware) {
+        puts("using hardware timestamps");
+        flags += PF_RING_ZC_DEVICE_HW_TIMESTAMP;
+      }
       zq = pfring_zc_open_device(zc, device, tx_only, 0);
   
       if(zq == NULL) {
