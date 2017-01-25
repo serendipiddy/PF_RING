@@ -849,6 +849,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (device) {
+      int flags = 0;
       if (use_hardware) {
         puts("using hardware timestamps");
         flags += PF_RING_ZC_DEVICE_HW_TIMESTAMP;
