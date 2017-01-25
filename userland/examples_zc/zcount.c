@@ -379,7 +379,10 @@ int main(int argc, char* argv[]) {
 
   // zq = pfring_zc_open_device(zc, device, rx_only, 0);
   int flags = 0;
-  if (use_hardware) flags += PF_RING_ZC_DEVICE_HW_TIMESTAMP;
+  if (use_hardware) {
+    puts("using hardware timestamps");
+    flags += PF_RING_ZC_DEVICE_HW_TIMESTAMP;
+  }
   zq = pfring_zc_open_device(zc, device, rx_only, flags);
 
   if(zq == NULL) {
