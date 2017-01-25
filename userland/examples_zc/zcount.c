@@ -371,7 +371,8 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  zq = pfring_zc_open_device(zc, device, rx_only, 0);
+  // zq = pfring_zc_open_device(zc, device, rx_only, 0);
+  zq = pfring_zc_open_device(zc, device, rx_only, PF_RING_ZC_DEVICE_HW_TIMESTAMP);
 
   if(zq == NULL) {
     fprintf(stderr, "pfring_zc_open_device error [%s] Please check that %s is up and not already used\n",
