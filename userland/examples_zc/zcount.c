@@ -246,8 +246,10 @@ void *packet_consumer_thread(void *user) {
       if (use_lock_buffer)
       {
           lb_it->id++;
-          get_packet_timestamp(lb_it);
-          lock_buffer_push (lb_buffer, lb_it); 
+
+          // this is not using the 'hwts'
+          // get_packet_timestamp(lb_it);
+          // lock_buffer_push (lb_buffer, lb_it); 
           
           /* get timestamp from packet instead */
           lb_it->sec =  bswap_32(buffers[lru]->ts.tv_sec);

@@ -643,13 +643,13 @@ void *send_traffic(void *user) {
         if (!active) usleep(1);
       }
 
-      if (use_lock_buffer)
-      {
-          lb_it->id;
-          lb_it->sec  = bswap_32(buffers[buffer_id]->ts.tv_sec);
-          lb_it->nsec = bswap_32(buffers[buffer_id]->ts.tv_nsec);
-          lock_buffer_push (lb_buffer, lb_it); 
-      }
+      // if (use_lock_buffer)
+      // {
+          // lb_it->id;
+          // lb_it->sec  = bswap_32(buffers[buffer_id]->ts.tv_sec);
+          // lb_it->nsec = bswap_32(buffers[buffer_id]->ts.tv_nsec);
+          // lock_buffer_push (lb_buffer, lb_it); 
+      // }
 
 
       
