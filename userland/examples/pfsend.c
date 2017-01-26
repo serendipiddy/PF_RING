@@ -576,7 +576,7 @@ int main(int argc, char* argv[]) {
   int flags = 0 /* PF_RING_PROMISC */;
   if (use_hardware) {
     puts("enabling hardware timestamps");
-    flags += PF_RING_HW_TIMESTAMP;
+    flags |= PF_RING_HW_TIMESTAMP;
   }
   pd = pfring_open(device, 1500, flags);
   if(pd == NULL) { /* Print PR_RING version information (Or exit if pd == null) */
