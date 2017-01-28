@@ -100,6 +100,7 @@ volatile u_int64_t *pulse_timestamp_ns_n;
 u_char use_lock_buffer = 0; 
 struct lock_buffer * lb_buffer;
 int use_hardware = 0;
+int stopHalfWay = 0;
 
 static inline void get_packet_timestamp(struct id_time * it) {
     u_int64_t ts = *pulse_timestamp_ns_n;
@@ -396,6 +397,7 @@ void printHelp(void) {
   printf("-a              Active packet wait\n");
   printf("-Q <sock>       Enable VM support to attach a consumer from a VM (<sock> is a QEMU monitor sockets)\n");
   printf("-X <filename>   Log file name for timestamps of packets captured\n");
+  printf("-M              Stop at 20,000 packets and wait for 20s before continuing");
   exit(-1);
 }
 
@@ -609,6 +611,7 @@ void *send_traffic(void *user) {
 
   } else {
 #endif
+    // struct timespec tn;
     /****** Packet API ******/
     while (likely(!do_shutdown && (!num_to_send || numPkts < num_to_send))) {
       u_char *buffer = pfring_zc_pkt_buff_data(buffers[buffer_id], zq);
@@ -677,6 +680,13 @@ void *send_traffic(void *user) {
             if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
         }
       }
+      
+      if (stopHalfWay && numPkts == 20000) {
+          u_int32_t end = 20 + pulse_timestamp_ns_n>>32;
+          puts("beginning 20s wait");
+          while(end > pulse_timestamp_ns_n>>32);
+          puts("ended 20s wait");
+      }
     }
 
 #ifdef BURST_API  
@@ -705,7 +715,7 @@ int main(int argc, char* argv[]) {
 
   startTime.tv_sec = 0;
 
-  while((c = getopt(argc,argv,"ab:c:f:g:hi:m:n:o:p:r:l:zN:S:P:Q:X:s")) != '?') {
+  while((c = getopt(argc,argv,"ab:c:f:g:hi:m:n:o:p:r:l:zN:S:P:Q:X:sM")) != '?') {
     if((c == 255) || (c == -1)) break;
 
     switch(c) {
@@ -747,6 +757,9 @@ int main(int argc, char* argv[]) {
 	  mac_address[3] = mac_d, mac_address[4] = mac_e, mac_address[5] = mac_f;
 	}
       }
+      break;
+    case 'M':
+      stopHalfWay = 1;
       break;
     case 'n':
       num_to_send = atoi(optarg);
