@@ -681,10 +681,12 @@ void *send_traffic(void *user) {
         }
       }
       
-      if (stopHalfWay && numPkts == 20000) {
+      if (stopHalfWay && numPkts == 1000) {
           u_int32_t end = 20 + (*pulse_timestamp_ns_n>>32);
           puts("beginning 20s wait");
-          while(end > *pulse_timestamp_ns_n>>32);
+          while(end > (*pulse_timestamp_ns_n>>32)) {
+              
+          };
           puts("ended 20s wait");
       }
     }
