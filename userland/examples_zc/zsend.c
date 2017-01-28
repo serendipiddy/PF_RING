@@ -617,18 +617,18 @@ void *send_traffic(void *user) {
       u_char *buffer = pfring_zc_pkt_buff_data(buffers[buffer_id], zq);
 
       if(tosend) {
-	buffers[buffer_id]->len = tosend->len, memcpy(buffer, tosend->pkt, tosend->len);
-	tosend = tosend->next;
-      } else  {
-	buffers[buffer_id]->len = packet_len;
+            buffers[buffer_id]->len = tosend->len, memcpy(buffer, tosend->pkt, tosend->len);
+            tosend = tosend->next;
+          } else  {
+            buffers[buffer_id]->len = packet_len;
 
-	if (!num_queue_buffers || numPkts < num_queue_buffers + NBUFF || num_ips > 1) {
-	  /* forge all buffers 1 time */
-	  if (stdin_packet_len > 0)
-	    memcpy(buffer, stdin_packet, stdin_packet_len);
-	  else
-	    forge_udp_packet(buffer, numPkts);
-	}
+            if (!num_queue_buffers || numPkts < num_queue_buffers + NBUFF || num_ips > 1) {
+              /* forge all buffers 1 time */
+              if (stdin_packet_len > 0)
+                memcpy(buffer, stdin_packet, stdin_packet_len);
+              else
+                forge_udp_packet(buffer, numPkts);
+        }
       }
 
       // if (append_timestamp)
@@ -676,8 +676,8 @@ void *send_traffic(void *user) {
           while(*pulse_timestamp_ns - ts_ns_start < numPkts * ns_delta && !do_shutdown) {}
             // if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
         } else {
-          while((getticks() - tick_start) < (numPkts * tick_delta))
-            if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
+          while((getticks() - tick_start) < (numPkts * tick_delta)) {}
+            // if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
         }
       }
       
