@@ -683,7 +683,7 @@ void *send_traffic(void *user) {
       
       if (stopHalfWay && numPkts == 2000) {
           puts("beginning 20s wait");
-          sleep(2);
+          sleep(3);
           puts("ended 20s wait");
       }
     }
