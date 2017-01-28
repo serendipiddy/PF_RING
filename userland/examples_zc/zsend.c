@@ -959,7 +959,12 @@ int main(int argc, char* argv[]) {
   if (use_pulse_time)   while (!*pulse_timestamp_ns   && !do_shutdown); /* wait for ts */
   if (append_timestamp) while (!*pulse_timestamp_ns_n && !do_shutdown); /* wait for ts */
   
-  /* Lock buffer init */
+  /* Lock buffer init */#ifndef USE_BURST_API
+  puts("using burst API");
+  #else
+  puts(" ### NOT using burst API :( ### ");
+  #endif
+  
   if (use_lock_buffer) 
   {
       unsigned int sample_secs = pps * 20;  // // 4 minutes of data
