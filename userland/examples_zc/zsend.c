@@ -674,19 +674,13 @@ void *send_traffic(void *user) {
         u_int8_t synced = 0;
         if (use_pulse_time) {
           while(*pulse_timestamp_ns - ts_ns_start < numPkts * ns_delta && !do_shutdown) {}
-            // if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
+            if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
         } else {
           while((getticks() - tick_start) < (numPkts * tick_delta)) {}
-            // if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
+            if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
         }
       }
       
-      if (stopHalfWay && numPkts == 2000) {
-          puts("beginning 20s wait");
-          ts_ns_start += (u_int64_t) 20*1000000000;
-          sleep(3);
-          puts("ended 20s wait");
-      }
     }
 
 #ifdef BURST_API  
