@@ -246,7 +246,7 @@ void *packet_consumer_thread(void *user) {
 
       if (use_lock_buffer)
       {
-          u_char *pkt_data = pfring_zc_pkt_buff_data( &buffers[lru], zq);
+          u_char *pkt_data = pfring_zc_pkt_buff_data( buffers[lru], zq);
 
           // puts("hello");
           // struct ethhdr h = (struct ethhdr*) pkt_data[0];
