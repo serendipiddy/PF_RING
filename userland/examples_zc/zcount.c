@@ -54,6 +54,7 @@
 
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
+#include <net/ethernet.h>
 
 pfring_zc_cluster *zc;
 pfring_zc_queue *zq;
@@ -245,6 +246,7 @@ void *packet_consumer_thread(void *user) {
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
   int proto = 0;
+  struct ether_header* eth;
   struct iphdr* ip_hdr;
   struct tcphdr* tcp_hdr;
   struct ofp_header* ofp_hdr;
@@ -264,10 +266,19 @@ void *packet_consumer_thread(void *user) {
           lb_it->id++;
           
           memcpy(&lb_it->hi.hwts, &pkt_data[8], 6);
-          memcpy(&lb_it->hi.dst, &pkt_data[16], 6);
-          memcpy(&lb_it->hi.src, &pkt_data[22], 6);
+          
+          eth = &pkt_data[16];
+          
+          // memcpy(&lb_it->hi.dst, &pkt_data[16], 6);
+          // memcpy(&lb_it->hi.src, &pkt_data[22], 6);
+          memcpy(&lb_it->hi.dst, &eth->ether_dhost, 6);
+          memcpy(&lb_it->hi.src, &eth->ether_shost, 6);
           
           // ip_hdr = (struct iphdr *) &pkt_data[32];
+          ip_hdr = (struct iphdr *) eth + 16;
+          printf("_%d_\n", ip_hdr->version);
+          
+          
           proto = pkt_data[32+10];
           printf("_%X_\n", proto);
           // if (ip_hdr->protocol == 60) {// tcp 
