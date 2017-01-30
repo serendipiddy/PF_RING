@@ -275,7 +275,7 @@ void *packet_consumer_thread(void *user) {
           memcpy(&lb_it->hi.src, &eth->ether_shost, 6);
           
           // ip_hdr = (struct iphdr *) &pkt_data[32];
-          ip_hdr = (struct iphdr *) eth + 16;
+          ip_hdr = (struct iphdr *) (eth + 16);
           printf("_ _0x%X 0x%X\n", &ip_hdr , &pkt_data );
           printf("_%u_\n", ip_hdr->ihl     );
           printf("_%u_\n", ip_hdr->version );
