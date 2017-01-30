@@ -52,7 +52,7 @@
 //#define USE_BURST_API
 #define BURST_LEN   32
 
-#include <net/ip.h>
+#include <linux/ip.h>
 #include <net/tcp.h>
 
 pfring_zc_cluster *zc;
