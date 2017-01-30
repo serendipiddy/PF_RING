@@ -257,14 +257,14 @@ void *packet_consumer_thread(void *user) {
           u_char *pkt_data = pfring_zc_pkt_buff_data( buffers[lru], zq);
 
           lb_it->id++;
-          memcpy(&lb_it->hi.hwts, &pkt_data[8], 6);
-          memcpy(&lb_it->hi.dst, &pkt_data[16], 6);
-          memcpy(&lb_it->hi.src, &pkt_data[22], 6);
+          memcpy(&lb_it->hwts, &pkt_data[8], 6);
+          memcpy(&lb_it->dst, &pkt_data[16], 6);
+          memcpy(&lb_it->src, &pkt_data[22], 6);
           
           // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
           // ofp_hdr = &pkt_data[50 + 20];
           // lb_it->hi.type = ofp_hdr->type;
-          memcpy(&lb_it->hi.ofp, &pkt_data[50 + 21], 8);
+          memcpy(&lb_it->ofp, &pkt_data[50 + 21], 8);
 
           // the below function is not using the 'hwts'
           // get_packet_timestamp(lb_it);
