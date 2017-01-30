@@ -165,7 +165,8 @@ void * lock_buffer_write_loop( void * x ) { // struct lock_buffer * lb) {
     // printf("finish signal - write loop: %d\n", lb->finish_signal);
     lock_buffer_pull(lb, lbs);
     while (!lb->finish_signal) {
-        printf("WRITE: start: 0x%X  end: 0x%X\n",lbs->start, lbs->end);
+        // printf("WRITE: start: 0x%X  end: 0x%X\n",lbs->start, lbs->end);
+        puts("WRITE");
         fwrite(lbs->start, sizeof(struct id_time), lbs->end - lbs->start, lock_buffer_log_fp);
         puts("WRITTEN");
         writes++;
