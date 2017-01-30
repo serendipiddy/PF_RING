@@ -268,7 +268,7 @@ void *packet_consumer_thread(void *user) {
           
           ip_hdr = (struct iphdr *) &pkt_data[32];
           printf("_%X_\n", ntohs(ip_hdr->protocol));
-          if (ip_hdr->protocol == 60) {// tcp 
+          // if (ip_hdr->protocol == 60) {// tcp 
               tcp_hdr = (struct tcphdr *) ip_hdr + sizeof(struct iphdr);
               // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
               printf("_%X_\n", ntohs(tcp_hdr->th_sport));
@@ -277,7 +277,7 @@ void *packet_consumer_thread(void *user) {
               lb_it->hi.type = ofp_hdr->type;
               // lb_it->hi.xid = ofp_hdr->xid;
               memcpy(&lb_it->hi.xid, ip_hdr, 40);
-          }
+          // }
 
           // the below function is not using the 'hwts'
           // get_packet_timestamp(lb_it);
