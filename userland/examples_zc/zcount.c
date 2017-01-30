@@ -268,11 +268,11 @@ void *packet_consumer_thread(void *user) {
           
           ip_hdr = (struct iphdr *) &pkt_data[24];
           if (ip_hdr->protocol == 60) {// tcp 
-                puts("is tcp");
               tcp_hdr = (struct iphdr *) &pkt_data[44];
               // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
-              
-              ofp_hdr = (struct ofp_header*) tcp_hdr + tcp_hdr->th_off*4;
+              printf("0x%X + %d\n", tcp_hdr, tcp_hdr->th_off);
+              puts("hi");
+              ofp_hdr = (struct ofp_header*) (tcp_hdr + tcp_hdr->th_off*4);
               lb_it->hi.type = ofp_hdr->type;
               memcpy(&lb_it->hi.xid, ofp_hdr->xid, 4);
           }
