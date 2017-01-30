@@ -267,7 +267,7 @@ void *packet_consumer_thread(void *user) {
           memcpy(&lb_it->hi.src, &pkt_data[22], 6);
           
           ip_hdr = (struct iphdr *) &pkt_data[24];
-          if (ip_hdr->protocol == 0x60) {// tcp 
+          if (ip_hdr->protocol == 60) {// tcp 
                 puts("is tcp");
               tcp_hdr = (struct iphdr *) &pkt_data[44];
               // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
