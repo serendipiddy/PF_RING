@@ -6,18 +6,19 @@
 #include <pthread.h>
 // #include <stdint.h>
 
-struct id_time {
-    u_int32_t id;
-    u_int32_t sec;
-    u_int32_t nsec;
-    struct header_info hi;
-};
 
 struct header_info {
     u_char hwts[6];
     u_char dst[6];
     u_char src[6];
     u_char type;
+};
+
+struct id_time {
+    u_int32_t id;
+    u_int32_t sec;
+    u_int32_t nsec;
+    struct header_info hi;
 };
 
 /* Lock buffer file pointer */
