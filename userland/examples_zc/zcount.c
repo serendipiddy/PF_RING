@@ -262,7 +262,7 @@ void *packet_consumer_thread(void *user) {
           memcpy(&lb_it->hi.dst, &pkt_data[16], 6);
           memcpy(&lb_it->hi.src, &pkt_data[22], 6);
           
-          shift = pkt_data[tcp_hdr+13]>>8;
+          shift = pkt_data[tcp_hdr+13]>>12;
           // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
           ofp_hdr = &pkt_data[50 + shift*4];
           lb_it->hi.type = ofp_hdr->type;
