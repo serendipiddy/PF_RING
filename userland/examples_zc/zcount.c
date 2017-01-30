@@ -234,6 +234,7 @@ void *packet_consumer_thread(void *user) {
   /* lock buffer */
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
+  lb_it->short_id = 0;
 
   if (bind_core >= 0)
     bind2core(bind_core);
@@ -247,7 +248,9 @@ void *packet_consumer_thread(void *user) {
       {
           u_char *pkt_data = pfring_zc_pkt_buff_data( &buffers[lru], zq);
 
-          printf("0x%8", (u_int16_t) pkt_data[2]);
+          puts("hello");
+          printf("0x%X", (u_int16_t) pkt_data[2]);
+          puts("bye");
           lb_it->id++;
 
           // this is not using the 'hwts'
