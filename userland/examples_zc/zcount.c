@@ -85,7 +85,7 @@ struct ofp_header {
     u_int8_t type;
     u_int16_t length;
     u_int32_t xid;
-}
+};
 
 static inline void get_packet_timestamp(struct id_time * it) {
     u_int64_t ts = *pulse_timestamp_ns_n;
