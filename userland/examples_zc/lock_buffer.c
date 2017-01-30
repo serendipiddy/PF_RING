@@ -10,7 +10,7 @@ struct id_time {
     u_int64_t id;
     u_int32_t sec;
     u_int32_t nsec;
-    u_char buff[32];
+    u_char buff[64];
 };
 
 /* Lock buffer file pointer */
