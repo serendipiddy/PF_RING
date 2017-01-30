@@ -250,7 +250,7 @@ void *packet_consumer_thread(void *user) {
 
           // puts("hello");
           // struct ethhdr h = (struct ethhdr*) pkt_data[0];
-          printf("0x%08X", (u_int16_t) pkt_data[2]);
+          printf("0x%08X\n", (u_int16_t) pkt_data[5]);
           // puts("bye");
           lb_it->id++;
 
