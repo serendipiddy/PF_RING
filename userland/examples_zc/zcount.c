@@ -270,7 +270,6 @@ void *packet_consumer_thread(void *user) {
           if (ip_hdr->protocol == 60) {// tcp 
               tcp_hdr = (struct iphdr *) &pkt_data[44];
               // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
-              printf("0x%X + %d\n", tcp_hdr, tcp_hdr->th_off);
               puts("hi");
               ofp_hdr = (struct ofp_header*) (tcp_hdr + tcp_hdr->th_off*4);
               lb_it->hi.type = ofp_hdr->type;
