@@ -273,8 +273,8 @@ void *packet_consumer_thread(void *user) {
         prev_ns = now_ns;
       }
 
-      if (unlikely(verbose))
-        print_packet(buffers[lru]);
+      // if (unlikely(verbose))
+        // print_packet(buffers[lru]);
 
       numPkts++;
       numBytes += buffers[lru]->len + 24; /* 8 Preamble + 4 CRC + 12 IFG */
