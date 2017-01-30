@@ -52,6 +52,9 @@
 //#define USE_BURST_API
 #define BURST_LEN   32
 
+#include <net/ip.h>
+#include <net/tcp.h>
+
 pfring_zc_cluster *zc;
 pfring_zc_queue *zq;
 pfring_zc_pkt_buff *buffers[NBUFF];
@@ -242,8 +245,12 @@ void *packet_consumer_thread(void *user) {
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
   int tcp_hdr = 50;
+  struct iphdr* ip_hdr;
+  struct tcphdr* tcp_hdr;
   struct ofp_header* ofp_hdr;
+  struct 
   int shift = 5;
+  int proto = 0;
 
   if (bind_core >= 0)
     bind2core(bind_core);
@@ -258,15 +265,20 @@ void *packet_consumer_thread(void *user) {
           u_char *pkt_data = pfring_zc_pkt_buff_data( buffers[lru], zq);
 
           lb_it->id++;
+          
           memcpy(&lb_it->hi.hwts, &pkt_data[8], 6);
           memcpy(&lb_it->hi.dst, &pkt_data[16], 6);
           memcpy(&lb_it->hi.src, &pkt_data[22], 6);
           
-          shift = pkt_data[tcp_hdr+13]>>12;
-          // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
-          ofp_hdr = &pkt_data[50 + shift*4];
-          lb_it->hi.type = ofp_hdr->type;
-          memcpy(&lb_it->hi.xid, ofp_hdr->xid, 4);
+          ip_hdr = (struct iphdr *) &pkt_data[24];
+          if (ip_hdr->protocol == 0x06) {// tcp 
+              tcp_hdr = (struct iphdr *) &pkt_data[44];
+              // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
+              
+              ofp_hdr = (struct ofp_header*) tcp_hdr + th_off*4;
+              lb_it->hi.type = ofp_hdr->type;
+              memcpy(&lb_it->hi.xid, ofp_hdr->xid, 4);
+          }
 
           // the below function is not using the 'hwts'
           // get_packet_timestamp(lb_it);
