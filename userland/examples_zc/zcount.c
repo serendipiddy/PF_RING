@@ -275,7 +275,7 @@ void *packet_consumer_thread(void *user) {
               lb_it->hi.type = ofp_hdr->type;
               memcpy(&lb_it->hi.xid, ofp_hdr->xid, 4);
           }
-          else(prinf("%d", ip_hdr->protocol));
+          else(printf("%d", ip_hdr->protocol));
 
           // the below function is not using the 'hwts'
           // get_packet_timestamp(lb_it);
