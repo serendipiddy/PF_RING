@@ -274,7 +274,7 @@ void *packet_consumer_thread(void *user) {
               puts("hi");
               ofp_hdr = (struct ofp_header*) (tcp_hdr + tcp_hdr->th_off*4);
               lb_it->hi.type = ofp_hdr->type;
-              memcpy(&lb_it->hi.xid, ofp_hdr->xid, 4);
+              hi.xid = ofp_hdr->xid;
           }
 
           // the below function is not using the 'hwts'
