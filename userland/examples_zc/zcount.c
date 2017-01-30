@@ -80,6 +80,13 @@ struct lock_buffer * lb_buffer;
 int pps = -1;
 int use_hardware = 0;
 
+struct ofp_header {
+    u_int8_t version;
+    u_int8_t type;
+    u_int16_t length;
+    u_int32_t xid;
+}
+
 static inline void get_packet_timestamp(struct id_time * it) {
     u_int64_t ts = *pulse_timestamp_ns_n;
     it->sec  = ts >> 32; 
@@ -234,6 +241,9 @@ void *packet_consumer_thread(void *user) {
   /* lock buffer */
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
+  int tcp_hdr = 50;
+  struct ofp_header* ofp_hdr;
+  int shift = 5;
 
   if (bind_core >= 0)
     bind2core(bind_core);
@@ -251,8 +261,12 @@ void *packet_consumer_thread(void *user) {
           memcpy(&lb_it->hi.hwts, &pkt_data[8], 6);
           memcpy(&lb_it->hi.dst, &pkt_data[16], 6);
           memcpy(&lb_it->hi.src, &pkt_data[22], 6);
-          memcpy(&lb_it->hi.type, &pkt_data[50], 50);
-          // lb_it->hi.type = pkt_data[54];
+          
+          shift = pkt_data[tcp_hdr+13]>>8;
+          // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
+          ofp_hdr = &pkt_data[50 + shift*8];
+          lb_it->hi.type = ofp_header->type;
+          memcpy(&lb_it->hi.xid, ofp_header->type, 4);
 
           // the below function is not using the 'hwts'
           // get_packet_timestamp(lb_it);
