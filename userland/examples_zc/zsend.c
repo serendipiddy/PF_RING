@@ -223,8 +223,8 @@ static void forge_udp_packet(u_char *buffer, u_int idx) {
 #endif
 
   if (idx == 0) { /* first packet, precomputing headers */
-    for(i = 0; i < 12; i++) buffer[i] = i;
-    buffer[12] = 0x08, buffer[13] = 0x00; /* IP */
+    for(i = 0; i < 12; i++) buffer[i] = i; /* ethernet header */
+    buffer[12] = 0x08, buffer[13] = 0x00; /* set ethtype to IP 0x0800 */
 
     ip_header = (struct ip_header*) &buffer[sizeof(struct ether_header)];
     ip_header->ihl = 5;
@@ -609,7 +609,8 @@ void *send_traffic(void *user) {
 
     } 
 
-  } else {
+  } 
+  else {
 #endif
     // struct timespec tn;
     /****** Packet API ******/
@@ -627,7 +628,7 @@ void *send_traffic(void *user) {
               if (stdin_packet_len > 0)
                 memcpy(buffer, stdin_packet, stdin_packet_len);
               else {
-                puts("forgin UDP packet");
+                // puts("forgin UDP packet");
                 forge_udp_packet(buffer, numPkts);
               }
         }
@@ -635,6 +636,8 @@ void *send_traffic(void *user) {
 
       // if (append_timestamp)
         // buffers[buffer_id]->len = append_packet_ts(buffer, buffers[buffer_id]->len);
+    
+      buffer[12] = 0x09;
     
       if (use_lock_buffer)
       {
