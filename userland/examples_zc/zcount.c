@@ -52,8 +52,8 @@
 //#define USE_BURST_API
 #define BURST_LEN   32
 
-#include <linux/ip.h>
-#include <net/tcp.h>
+#include <netinet/ip.h>
+#include <netinet/tcp.h>
 
 pfring_zc_cluster *zc;
 pfring_zc_queue *zq;
