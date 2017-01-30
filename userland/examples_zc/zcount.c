@@ -52,10 +52,6 @@
 //#define USE_BURST_API
 #define BURST_LEN   32
 
-#include <netinet/ip.h>
-#include <netinet/tcp.h>
-#include <net/ethernet.h>
-
 pfring_zc_cluster *zc;
 pfring_zc_queue *zq;
 pfring_zc_pkt_buff *buffers[NBUFF];
@@ -245,10 +241,7 @@ void *packet_consumer_thread(void *user) {
   /* lock buffer */
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
-  int proto = 0;
-  struct ether_header* eth;
-  struct iphdr* ip_hdr;
-  struct tcphdr* tcp_hdr;
+  int tcp_hdr = 50;
   struct ofp_header* ofp_hdr;
 
   if (bind_core >= 0)
@@ -264,37 +257,14 @@ void *packet_consumer_thread(void *user) {
           u_char *pkt_data = pfring_zc_pkt_buff_data( buffers[lru], zq);
 
           lb_it->id++;
-          
           memcpy(&lb_it->hi.hwts, &pkt_data[8], 6);
+          memcpy(&lb_it->hi.dst, &pkt_data[16], 6);
+          memcpy(&lb_it->hi.src, &pkt_data[22], 6);
           
-          eth = &pkt_data[16];
-          
-          // memcpy(&lb_it->hi.dst, &pkt_data[16], 6);
-          // memcpy(&lb_it->hi.src, &pkt_data[22], 6);
-          memcpy(&lb_it->hi.dst, &eth->ether_dhost, 6);
-          memcpy(&lb_it->hi.src, &eth->ether_shost, 6);
-          
-          // ip_hdr = (struct iphdr *) &pkt_data[32];
-          // ip_hdr = (struct iphdr *) (eth + 16);
-          ip_hdr = (struct iphdr *) &pkt_data[32];
-          printf("_ _0x%X 0x%X\n", ip_hdr , pkt_data );
-          printf("_%u_\n", ip_hdr->ihl     );
-          printf("_%u_\n", ip_hdr->version );
-          printf("_%u_0x%X\n", ip_hdr->protocol, &ip_hdr->protocol);
-          
-          
-          proto = pkt_data[32+10];
-          // printf("_%X_\n", proto);
-          // if (ip_hdr->protocol == 60) {// tcp 
-              tcp_hdr = (struct tcphdr *) ip_hdr + sizeof(struct iphdr);
-              // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
-              // printf("_%X_\n", ntohs(tcp_hdr->th_sport));
-              // printf("_0x%X_0x%X_\n", ip_hdr, tcp_hdr);
-              ofp_hdr = (struct ofp_header*) (tcp_hdr + tcp_hdr->th_off*4);
-              lb_it->hi.type = ofp_hdr->type;
-              // lb_it->hi.xid = ofp_hdr->xid;
-              memcpy(&lb_it->hi.xid, ip_hdr, 40);
-          // }
+          // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
+          ofp_hdr = &pkt_data[50 + 20];
+          lb_it->hi.type = ofp_hdr->type;
+          memcpy(&lb_it->hi.xid, &ofp_hdr->xid, 4);
 
           // the below function is not using the 'hwts'
           // get_packet_timestamp(lb_it);
