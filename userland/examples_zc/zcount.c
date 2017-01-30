@@ -264,7 +264,7 @@ void *packet_consumer_thread(void *user) {
           // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
           // ofp_hdr = &pkt_data[50 + 20];
           // lb_it->hi.type = ofp_hdr->type;
-          memcpy(&lb_it->ofp, &pkt_data[50 + 24], 8);
+          memcpy(&lb_it->ofp, &pkt_data[50 + 22], 8);
 
           // the below function is not using the 'hwts'
           // get_packet_timestamp(lb_it);
