@@ -17,8 +17,8 @@ struct header_info {
     u_char hwts[6];
     u_char dst[6];
     u_char src[6];
-    u_char type[2];
-}
+    u_char type;
+};
 
 /* Lock buffer file pointer */
 FILE * lock_buffer_log_fp;
