@@ -639,17 +639,17 @@ void *send_traffic(void *user) {
         // buffers[buffer_id]->len = append_packet_ts(buffer, buffers[buffer_id]->len);
     
       /* Set destination address with a 16 bit ID */
-      matrix_buffer[6]++;
-      if (matrix_buffer[6] == 0x00) {
-          matrix_buffer[5]++;
-          if (matrix_buffer[5] == 0x00) {
-              matrix_buffer[4]++;
-              if (matrix_buffer[4] == 0x00) {
-                matrix_buffer[3]++;
+      matrix_buffer[5]++;
+      if (matrix_buffer[5] == 0x00) {
+          matrix_buffer[4]++;
+          if (matrix_buffer[4] == 0x00) {
+              matrix_buffer[3]++;
+              if (matrix_buffer[3] == 0x00) {
+                matrix_buffer[2]++;
               }
           }
       }
-      printf("0x%8", (u_int16_t) matrix_buffer[3]);
+      // printf("0x%8", (u_int16_t) matrix_buffer[3]);
       // buffer[0] = 0x09; 
       // buffer[1] = 0x09; 
       // buffer[2] = 0x09; 
