@@ -567,21 +567,21 @@ void *send_traffic(void *user) {
     while (likely(!do_shutdown && (!num_to_send || numPkts < num_to_send))) {
 
       if (!num_queue_buffers || numPkts < num_queue_buffers + NBUFF || num_ips > 1) { /* forge all buffers 1 time */
-	for (i = 0; i < BURSTLEN; i++) {
-	  u_char *buffer = pfring_zc_pkt_buff_data(buffers[buffer_id + i], zq);
+        for (i = 0; i < BURSTLEN; i++) {
+          u_char *buffer = pfring_zc_pkt_buff_data(buffers[buffer_id + i], zq);
 
-	  if(tosend) {
-	    buffers[buffer_id + i]->len = tosend->len, memcpy(buffer, tosend->pkt, tosend->len);
-	    tosend = tosend->next;
-	  } else  {
-	    buffers[buffer_id + i]->len = packet_len;
-	    
-	    if (stdin_packet_len > 0)
-	      memcpy(buffer, stdin_packet, stdin_packet_len);
-	    else
-	      forge_udp_packet(buffer, numPkts + i);
-	  }
-	}
+          if(tosend) {
+            buffers[buffer_id + i]->len = tosend->len, memcpy(buffer, tosend->pkt, tosend->len);
+            tosend = tosend->next;
+          } else  {
+            buffers[buffer_id + i]->len = packet_len;
+            
+            if (stdin_packet_len > 0)
+              memcpy(buffer, stdin_packet, stdin_packet_len);
+            else
+              forge_udp_packet(buffer, numPkts + i);
+          }
+        }
       }
 
       /* TODO send unsent packets when a burst is partially sent */
@@ -626,8 +626,10 @@ void *send_traffic(void *user) {
               /* forge all buffers 1 time */
               if (stdin_packet_len > 0)
                 memcpy(buffer, stdin_packet, stdin_packet_len);
-              else
+              else {
+                puts("forgin UDP packet");
                 forge_udp_packet(buffer, numPkts);
+              }
         }
       }
 
@@ -645,24 +647,6 @@ void *send_traffic(void *user) {
         if (unlikely(do_shutdown)) break;
         if (!active) usleep(1);
       }
-
-      // if (use_lock_buffer)
-      // {
-          // lb_it->id;
-          // lb_it->sec  = bswap_32(buffers[buffer_id]->ts.tv_sec);
-          // lb_it->nsec = bswap_32(buffers[buffer_id]->ts.tv_nsec);
-          // lock_buffer_push (lb_buffer, lb_it); 
-      // }
-
-
-      
-      /* Test time stamp for *after* the packet has been sent */
-      // if (use_lock_buffer)
-      // {
-          // lb_it->id; 
-          // get_packet_timestamp(lb_it);
-          // lock_buffer_push (lb_buffer, lb_it); 
-      // }
 
       numPkts++;
       numBytes += sent_bytes + 24; /* 8 Preamble + 4 CRC + 12 IFG */
