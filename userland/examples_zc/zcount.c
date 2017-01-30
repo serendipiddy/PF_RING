@@ -234,7 +234,6 @@ void *packet_consumer_thread(void *user) {
   /* lock buffer */
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
-  // lb_it->short_id = 0;
 
   if (bind_core >= 0)
     bind2core(bind_core);
@@ -249,7 +248,10 @@ void *packet_consumer_thread(void *user) {
           u_char *pkt_data = pfring_zc_pkt_buff_data( buffers[lru], zq);
 
           lb_it->id++;
-          memcpy(&lb_it->buff, pkt_data, 64);
+          memcpy(&lb_it->hi.hwts, pkt_data[8], 6);
+          memcpy(&lb_it->hi.dst, pkt_data[16], 6);
+          memcpy(&lb_it->hi.src, pkt_data[22], 6);
+          &lb_it->hi.type = pkt_data[54];
 
           // the below function is not using the 'hwts'
           // get_packet_timestamp(lb_it);
