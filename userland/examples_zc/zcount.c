@@ -269,11 +269,12 @@ void *packet_consumer_thread(void *user) {
           ip_hdr = (struct iphdr *) &pkt_data[24];
           if (ip_hdr->protocol == 60) {// tcp 
               tcp_hdr = (struct iphdr *) ip_hdr + sizeof(struct iphdr);
-              printf("_%X_\n", ntohs(tcp_hdr->th_sport));
               // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
+              printf("_%X_\n", ntohs(tcp_hdr->th_sport));
               ofp_hdr = (struct ofp_header*) (tcp_hdr + tcp_hdr->th_off*4);
               lb_it->hi.type = ofp_hdr->type;
-              lb_it->hi.xid = ofp_hdr->xid;
+              // lb_it->hi.xid = ofp_hdr->xid;
+              memcpy(&lb_it->hi.xid, tcp_hdr, 40);
           }
 
           // the below function is not using the 'hwts'
