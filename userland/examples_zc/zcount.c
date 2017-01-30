@@ -244,13 +244,9 @@ void *packet_consumer_thread(void *user) {
   /* lock buffer */
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
-  int tcp_hdr = 50;
   struct iphdr* ip_hdr;
   struct tcphdr* tcp_hdr;
   struct ofp_header* ofp_hdr;
-  struct 
-  int shift = 5;
-  int proto = 0;
 
   if (bind_core >= 0)
     bind2core(bind_core);
