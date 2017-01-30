@@ -266,8 +266,9 @@ void *packet_consumer_thread(void *user) {
           memcpy(&lb_it->hi.dst, &pkt_data[16], 6);
           memcpy(&lb_it->hi.src, &pkt_data[22], 6);
           
-          ip_hdr = (struct iphdr *) &pkt_data[32];
-          printf("_%X_\n", ntohs(ip_hdr->protocol));
+          // ip_hdr = (struct iphdr *) &pkt_data[32];
+          proto = pkt_data[32+10];
+          printf("_%X_\n", proto);
           // if (ip_hdr->protocol == 60) {// tcp 
               tcp_hdr = (struct tcphdr *) ip_hdr + sizeof(struct iphdr);
               // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
