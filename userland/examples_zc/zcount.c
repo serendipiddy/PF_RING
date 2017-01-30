@@ -245,6 +245,9 @@ void *packet_consumer_thread(void *user) {
 
       if (use_lock_buffer)
       {
+          u_char *pkt_data = pfring_zc_pkt_buff_data( &buffers[lru], zq);
+
+          printf("0x%8", (u_int16_t) pkt_data[3]);
           lb_it->id++;
 
           // this is not using the 'hwts'
