@@ -562,6 +562,7 @@ void *send_traffic(void *user) {
       printf("Rate set to %u pps\n", pps);
   }
 
+  u_int16_t * destination_address;
 #ifdef BURST_API  
   /****** Burst API ******/
   if (use_pkt_burst_api) {
@@ -639,7 +640,9 @@ void *send_traffic(void *user) {
         // buffers[buffer_id]->len = append_packet_ts(buffer, buffers[buffer_id]->len);
     
       /* Set destination address */
-      buffer[0] = 0x09; 
+      destination_address = (u_int16_t *) buffer;
+      destination_address++;
+      // buffer[0] = 0x09; 
       // buffer[1] = 0x09; 
       // buffer[2] = 0x09; 
       // buffer[3] = 0x09; 
