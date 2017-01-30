@@ -11,7 +11,7 @@ struct header_info {
     u_char hwts[6];
     u_char dst[6];
     u_char src[6];
-    u_char type[30];
+    u_char type[50];
 };
 
 struct id_time {
