@@ -265,7 +265,7 @@ void *packet_consumer_thread(void *user) {
           shift = pkt_data[tcp_hdr+13]>>8;
           // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
           ofp_hdr = &pkt_data[50 + shift*8];
-          lb_it->hi.type = ofp_header->type;
+          lb_it->hi.type = ofp_hdr->type;
           memcpy(&lb_it->hi.xid, ofp_hdr->type, 4);
 
           // the below function is not using the 'hwts'
