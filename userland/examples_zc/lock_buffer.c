@@ -12,7 +12,7 @@ struct header_info {
     u_char dst[6];
     u_char src[6];
     u_char type;
-    u_int32_t xid[4];
+    u_int32_t xid;
 };
 
 struct id_time {
