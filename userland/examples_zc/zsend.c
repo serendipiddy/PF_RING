@@ -641,7 +641,7 @@ void *send_traffic(void *user) {
     
       /* Set destination address */
       destination_address = (u_int16_t *) buffer;
-      *destination_address++;
+      (*destination_address)++;
       // buffer[0] = 0x09; 
       // buffer[1] = 0x09; 
       // buffer[2] = 0x09; 
