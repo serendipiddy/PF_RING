@@ -276,7 +276,9 @@ void *packet_consumer_thread(void *user) {
           
           // ip_hdr = (struct iphdr *) &pkt_data[32];
           ip_hdr = (struct iphdr *) eth + 16;
+          printf("_%u_\n", ip_hdr->ihl);
           printf("_%u_\n", ip_hdr->version);
+          printf("_%u_\n", ip_hdr->protocol);
           
           
           proto = pkt_data[32+10];
