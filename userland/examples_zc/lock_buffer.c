@@ -10,7 +10,7 @@ struct id_time {
     u_int64_t id;
     u_int32_t sec;
     u_int32_t nsec;
-    u_int16_t short_id;
+    // u_int16_t short_id;
 };
 
 /* Lock buffer file pointer */
@@ -166,9 +166,9 @@ void * lock_buffer_write_loop( void * x ) { // struct lock_buffer * lb) {
     lock_buffer_pull(lb, lbs);
     while (!lb->finish_signal) {
         // printf("WRITE: start: 0x%X  end: 0x%X\n",lbs->start, lbs->end);
-        puts("WRITE");
+        // puts("WRITE");
         fwrite(lbs->start, sizeof(struct id_time), lbs->end - lbs->start, lock_buffer_log_fp);
-        puts("WRITTEN");
+        // puts("WRITTEN");
         writes++;
         lock_buffer_pull(lb, lbs);
     }

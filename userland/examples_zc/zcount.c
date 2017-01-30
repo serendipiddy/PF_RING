@@ -234,7 +234,7 @@ void *packet_consumer_thread(void *user) {
   /* lock buffer */
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
-  lb_it->short_id = 0;
+  // lb_it->short_id = 0;
 
   if (bind_core >= 0)
     bind2core(bind_core);
