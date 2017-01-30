@@ -248,13 +248,10 @@ void *packet_consumer_thread(void *user) {
       {
           u_char *pkt_data = pfring_zc_pkt_buff_data( buffers[lru], zq);
 
-          // puts("hello");
-          // struct ethhdr h = (struct ethhdr*) pkt_data[0];
-          printf("0x%08X\n", (u_int16_t) pkt_data[5]);
-          // puts("bye");
           lb_it->id++;
+          memcpy(&lb_it->buff, pkt_data, 32);
 
-          // this is not using the 'hwts'
+          // the below function is not using the 'hwts'
           // get_packet_timestamp(lb_it);
           // lock_buffer_push (lb_buffer, lb_it); 
           
