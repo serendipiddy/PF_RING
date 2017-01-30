@@ -639,7 +639,7 @@ void *send_traffic(void *user) {
         // buffers[buffer_id]->len = append_packet_ts(buffer, buffers[buffer_id]->len);
     
       /* Set destination address */
-      buffer[0]++; 
+      buffer[0] = 0x09; 
       // buffer[1] = 0x09; 
       // buffer[2] = 0x09; 
       // buffer[3] = 0x09; 
