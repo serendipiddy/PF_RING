@@ -271,7 +271,7 @@ void *packet_consumer_thread(void *user) {
               tcp_hdr = (struct iphdr *) &pkt_data[44];
               // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
               
-              ofp_hdr = (struct ofp_header*) tcp_hdr + th_off*4;
+              ofp_hdr = (struct ofp_header*) tcp_hdr + tcp_hdr->th_off*4;
               lb_it->hi.type = ofp_hdr->type;
               memcpy(&lb_it->hi.xid, ofp_hdr->xid, 4);
           }
