@@ -223,8 +223,9 @@ static void forge_udp_packet(u_char *buffer, u_int idx) {
 #endif
 
   if (idx == 0) { /* first packet, precomputing headers */
-    for(i = 0; i < 12; i++) buffer[i] = i; /* ethernet header */
-    buffer[12] = 0x08, buffer[13] = 0x00; /* set ethtype to IP 0x0800 */
+    for(i = 0; i < 6; i++) buffer[i] = 0x00; /* ethernet destination */
+    for(i = 6; i < 12; i++) buffer[i] = i; /* ethernet source */
+    buffer[12] = 0x08, buffer[13] = 0x00; /* ethtype to IP 0x0800 */
 
     ip_header = (struct ip_header*) &buffer[sizeof(struct ether_header)];
     ip_header->ihl = 5;
@@ -637,7 +638,13 @@ void *send_traffic(void *user) {
       // if (append_timestamp)
         // buffers[buffer_id]->len = append_packet_ts(buffer, buffers[buffer_id]->len);
     
-      buffer[12] = 0x09;
+      /* Set destination address */
+      buffer[0]++; 
+      // buffer[1] = 0x09; 
+      // buffer[2] = 0x09; 
+      // buffer[3] = 0x09; 
+      // buffer[4] = 0x09; 
+      // buffer[5] = 0x09; 
     
       if (use_lock_buffer)
       {
