@@ -249,7 +249,8 @@ void *packet_consumer_thread(void *user) {
           u_char *pkt_data = pfring_zc_pkt_buff_data( &buffers[lru], zq);
 
           puts("hello");
-          printf("0x%X", (u_int16_t) pkt_data[2]);
+          // struct ethhdr h = (struct ethhdr*) pkt_data[0];
+          printf("0x%08X", (u_int16_t) pkt_data[2]);
           puts("bye");
           lb_it->id++;
 
