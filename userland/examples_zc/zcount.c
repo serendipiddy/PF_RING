@@ -244,6 +244,7 @@ void *packet_consumer_thread(void *user) {
   /* lock buffer */
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
+  int proto = 0;
   struct iphdr* ip_hdr;
   struct tcphdr* tcp_hdr;
   struct ofp_header* ofp_hdr;
