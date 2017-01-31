@@ -236,7 +236,7 @@ void print_packet(pfring_zc_pkt_buff *buffer) {
 /* *************************************** */
 
 void process_ofp(struct ofp_header * ofp) {
-    printf("OFP: type(%u) xid(%u)\n", ofp->type, ofp->xid);
+    printf("OFP: type(%u) xid(%u) - ", ofp->type, ofp->xid);
     
     if (ofp->type == OFPT_PACKET_IN) {
         struct ofp_packet_in* p = (struct ofp_packet_in*) ofp;
@@ -258,7 +258,7 @@ void process_ofp(struct ofp_header * ofp) {
         printf("FLOW_MOD: xid(%u)\n", ofp->xid);
         struct ofp_match* m = (struct ofp_match*) &((struct ofp_flow_mod *)ofp)->match ;
         
-        printf("tot_len(%hu) match_len(%hu)\n", ofp->length);
+        printf("tot_len(%hu) match_len(%hu)\n", ntohs(ofp->length), ntohs(m->length));
         m->oxm_fields;
     }
     else if (ofp->type == OFPT_ECHO_REQUEST) {
