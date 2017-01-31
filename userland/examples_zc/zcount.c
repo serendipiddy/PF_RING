@@ -82,6 +82,7 @@ int use_hardware = 0;
 
 #include "openflow.h"
 #include <net/ethernet.h>
+#include <netinet/tcp.h>
 
 // struct ofp_header {
     // u_int8_t version;
@@ -322,7 +323,7 @@ void *packet_consumer_thread(void *user) {
           if (tcp_hdr->ack) lb_it->ack = 1;
           ofp = (struct ofp_header*) &pkt_data[tcp_hdr_idx + 32]; // start the ofp header after a tcp 8*4=32 byte option-shift
           if (ofp->version == 4) {
-              process_ofp(ofp, &lb_it->ofp);
+              process_ofp(ofp, (char *) &lb_it->ofp);
           }
           // memcpy(&lb_it->ofp, ofp, 8); // this gets the 64 bit ofp header 
           
