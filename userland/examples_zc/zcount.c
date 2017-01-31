@@ -80,6 +80,8 @@ struct lock_buffer * lb_buffer;
 int pps = -1;
 int use_hardware = 0;
 
+#include "openflow.h"
+
 // struct ofp_header {
     // u_int8_t version;
     // u_int8_t type;
@@ -232,6 +234,32 @@ void print_packet(pfring_zc_pkt_buff *buffer) {
 
 /* *************************************** */
 
+void process_ofp(struct ofp_header * ofp) {
+    ofp = &pkt_data[50 + 32]; // start the ofp header after a tcp 8*4=32 byte option-shift
+    printf("OFP: type(%u) xid(%u)\n", ofp->type, ofp->xid);
+    
+    if (ofp->type == ofp_type.OFPT_PACKET_IN) {
+        printf("PKT_IN: xid(%u)\n", ofp->xid);
+        
+    }
+    else if (ofp->type == ofp_type.OFPT_PACKET_OUT ) {
+        printf("PKT_OUT: xid(%u)\n", ofp->xid);
+        
+    }
+    else if (ofp->type == ofp_type.OFPT_FLOW_MOD ) {
+        printf("FLOW_MOD: xid(%u)\n", ofp->xid);
+        
+    }
+    else if (ofp->type == ofp_type.OFPT_ECHO_REQUEST) {
+        printf("ECHO_REQUEST\n");
+    }
+    else if (ofp->type == ofp_type.OFPT_ECHO_REPLY ) {
+        printf("ECHO_REPLY\n");
+    }
+    else {
+        printf("Unexpected OFP type: type(%u) xid(%u)\n", ofp->type, ofp->xid);
+    }
+}
 
 void *packet_consumer_thread(void *user) {
 #ifdef USE_BURST_API
@@ -242,7 +270,7 @@ void *packet_consumer_thread(void *user) {
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
   int tcp_hdr = 50;
-  struct ofp_header* ofp_hdr;
+  struct ofp_header* ofp;
 
   if (bind_core >= 0)
     bind2core(bind_core);
@@ -264,8 +292,15 @@ void *packet_consumer_thread(void *user) {
           // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
           // ofp_hdr = &pkt_data[50 + 20];
           // lb_it->hi.type = ofp_hdr->type;
-          memcpy(&lb_it->ofp, &pkt_data[50 + 32], 8);
+          
+          // // memcpy(&lb_it->ofp, &pkt_data[50 + 32], 8); // this WORKS
 
+          ofp = &pkt_data[50 + 32]; // start the ofp header after a tcp 8*4=32 byte option-shift
+          if (ofp->version == 4) {
+              process_ofp(ofp);
+          }
+          memcpy(&lb_it->ofp, ofp, 8); // this WORKS
+          
           // the below function is not using the 'hwts'
           // get_packet_timestamp(lb_it);
           // lock_buffer_push (lb_buffer, lb_it); 
