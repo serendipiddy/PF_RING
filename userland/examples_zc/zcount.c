@@ -241,6 +241,11 @@ void process_ofp(struct ofp_header * ofp) {
     if (ofp->type == OFPT_PACKET_IN) {
         struct ofp_packet_in* p = (struct ofp_packet_in*) ofp;
         printf("PKT_IN: xid(%u) len(%hu)\n", ofp->xid), p->total_len;
+        
+        printf("PKT_IN:\n  %02X%02X%02X%02X%02X%02X\n  %02X%02X%02X%02X%02X%02X\n", 
+            p[0], p[1], p[2], p[3], p[4],  p[5], 
+            p[6], p[7], p[8], p[9], p[10], p[11]);
+        
         struct ofp_match* match = &p->match;
         char oxm_values[match->length-3];
         memcpy(oxm_values, match->oxm_fields, match->length-4);
@@ -248,7 +253,7 @@ void process_ofp(struct ofp_header * ofp) {
         // printf("PKT MATCH: %s\n", oxm_values);
         
         struct ether_header* eth = p+32;
-        printf("InnerEth\n  SRC: %02X:%02X:%02X:%02X:%02X:%02X\n  DST:%02X:%02X:%02X:%02X:%02X:%02X\n", 
+        printf("InnerEth\n  SRC: %02X:%02X:%02X:%02X:%02X:%02X\n  DST: %02X:%02X:%02X:%02X:%02X:%02X\n", 
             eth[0], eth[1], eth[2], eth[3], eth[4], eth[5], 
             eth[6], eth[7], eth[8], eth[9], eth[10], eth[11]);
     }
