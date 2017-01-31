@@ -242,8 +242,8 @@ void process_ofp(struct ofp_header * ofp) {
         struct ofp_packet_in* p = (struct ofp_packet_in*) ofp;
         printf("PKT_IN: xid(%u) len(%hu)\n", ofp->xid), p->total_len;
         printf("addresses: pktin(0x%X) ofp(0x%X)\n", p, ofp);
-        printf("addresses: pktin(0x%X) ofp(0x%X)\n", p->header->type, p->type);
-        printf("addresses: pktin(0x%X) ofp(0x%X)\n", &p->header->type, &p->type);
+        printf("addresses: pktin(0x%X) ofp(0x%X)\n", p->header.type, ofp->type);
+        printf("addresses: pktin(0x%X) ofp(0x%X)\n", &p->header.type, &ofp->type);
         
         printf("PKT_IN:\n  %02X%02X%02X%02X%02X%02X\n  %02X%02X%02X%02X%02X%02X\n", 
             *( ((char *) p) ), *( ((char *) p) +1), *( ((char *) p) +2), *( ((char *) p) +3), *( ((char *) p) +4), *( ((char *) p) +5), 
