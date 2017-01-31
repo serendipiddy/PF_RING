@@ -237,22 +237,22 @@ void print_packet(pfring_zc_pkt_buff *buffer) {
 void process_ofp(struct ofp_header * ofp) {
     printf("OFP: type(%u) xid(%u)\n", ofp->type, ofp->xid);
     
-    if (ofp->type == ofp_type.OFPT_PACKET_IN) {
+    if (ofp->type == OFPT_PACKET_IN) {
         printf("PKT_IN: xid(%u)\n", ofp->xid);
         
     }
-    else if (ofp->type == ofp_type.OFPT_PACKET_OUT ) {
+    else if (ofp->type == OFPT_PACKET_OUT ) {
         printf("PKT_OUT: xid(%u)\n", ofp->xid);
         
     }
-    else if (ofp->type == ofp_type.OFPT_FLOW_MOD ) {
+    else if (ofp->type == OFPT_FLOW_MOD ) {
         printf("FLOW_MOD: xid(%u)\n", ofp->xid);
         
     }
-    else if (ofp->type == ofp_type.OFPT_ECHO_REQUEST) {
+    else if (ofp->type == OFPT_ECHO_REQUEST) {
         printf("ECHO_REQUEST\n");
     }
-    else if (ofp->type == ofp_type.OFPT_ECHO_REPLY ) {
+    else if (ofp->type == OFPT_ECHO_REPLY ) {
         printf("ECHO_REPLY\n");
     }
     else {
