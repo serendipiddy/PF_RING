@@ -243,23 +243,23 @@ void process_ofp(struct ofp_header * ofp) {
         printf("PKT_IN: xid(%u) len(%hu)\n", ofp->xid, p->total_len);
         printf("addresses: pktin(0x%X) ofp(0x%X)\n", p, ofp);
         printf("addresses: pktin(0x%X) ofp(0x%X)\n", p->header.type, ofp->type);
-        printf("addresses: pktin(0x%X) ofp(0x%X)\n", &p->header.type, &ofp->type);
-        printf("addresses: pktin(%hu)\n", p->total_len);
+        printf("addresses: pktin(0x%X)\n", p->total_len);
         
         printf("PKT_IN:\n  %02X%02X%02X%02X%02X%02X\n  %02X%02X%02X%02X%02X%02X\n", 
             *( ((char *) p) ), *( ((char *) p) +1), *( ((char *) p) +2), *( ((char *) p) +3), *( ((char *) p) +4), *( ((char *) p) +5), 
             *( ((char *) p) +6), *( ((char *) p) +7), *( ((char *) p) +8), *( ((char *) p) +9), *( ((char *) p) +10), *( ((char *) p) +11) );
-        
+            
         struct ofp_match* match = &p->match;
         char oxm_values[match->length-3];
         memcpy(oxm_values, match->oxm_fields, match->length-4);
         oxm_values[match->length-3] = '\0';
         // printf("PKT MATCH: %s\n", oxm_values);
         
-        struct ether_header* eth = p+32;
+        struct ether_header* eth = p+sizeof(struct ofp_packet_in) + 2 /* 2 padding bytes */;
+        printf("addresses: pktin(0x%X) eth(0x%X)\n", p, eth);
         printf("InnerEth\n  SRC: %02X:%02X:%02X:%02X:%02X:%02X\n  DST: %02X:%02X:%02X:%02X:%02X:%02X\n", 
-            eth[0], eth[1], eth[2], eth[3], eth[4], eth[5], 
-            eth[6], eth[7], eth[8], eth[9], eth[10], eth[11]);
+            eth.ether_dhost[0], eth.ether_dhost[1], eth.ether_dhost[2], eth.ether_dhost[3], eth.ether_dhost[4], eth.ether_dhost[5], 
+            eth.ether_shost[6], eth.ether_shost[7], eth.ether_shost[8], eth.ether_shost[9], eth.ether_shost[10], eth.ether_shost[11]);
     }
     else if (ofp->type == OFPT_PACKET_OUT ) {
         printf("PKT_OUT: xid(%u)\n", ofp->xid);
