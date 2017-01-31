@@ -235,7 +235,6 @@ void print_packet(pfring_zc_pkt_buff *buffer) {
 /* *************************************** */
 
 void process_ofp(struct ofp_header * ofp) {
-    ofp = &pkt_data[50 + 32]; // start the ofp header after a tcp 8*4=32 byte option-shift
     printf("OFP: type(%u) xid(%u)\n", ofp->type, ofp->xid);
     
     if (ofp->type == ofp_type.OFPT_PACKET_IN) {
