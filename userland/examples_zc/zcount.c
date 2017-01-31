@@ -250,7 +250,7 @@ void process_ofp(struct ofp_header * ofp) {
         printf("PKT_OUT: xid(%u) - ", ofp->xid);
         struct ofp_packet_out* p = (struct ofp_packet_out*) ofp;
         struct ether_header* eth = (struct ether_header*) (((char*)p) + sizeof(struct ofp_packet_out) + ntohs(p->actions_len));
-        printf("Encapsulated MAC SRC: %02X:%02X:%02X:%02X:%02X:%02X DST: %02X:%02X:%02X:%02X:%02X:%02X\n", 
+        printf("Encapsulated MAC DST: %02X:%02X:%02X:%02X:%02X:%02X SRC: %02X:%02X:%02X:%02X:%02X:%02X\n", 
             eth->ether_dhost[0], eth->ether_dhost[1], eth->ether_dhost[2], eth->ether_dhost[3], eth->ether_dhost[4], eth->ether_dhost[5], 
             eth->ether_shost[0], eth->ether_shost[1], eth->ether_shost[2], eth->ether_shost[3], eth->ether_shost[4], eth->ether_shost[5]);
     }
