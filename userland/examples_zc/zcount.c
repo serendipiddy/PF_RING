@@ -255,7 +255,7 @@ void process_ofp(struct ofp_header * ofp) {
         oxm_values[match->length-3] = '\0';
         // printf("PKT MATCH: %s\n", oxm_values);
         
-        struct ether_header* eth = p+sizeof(struct ofp_packet_in) + 2 /* 2 padding bytes */;
+        struct ether_header* eth = ((char*)p)+sizeof(struct ofp_packet_in) + 2 /* 2 padding bytes */;
         printf("addresses: pktin(0x%X) eth(0x%X)\n", p, eth);
         printf("InnerEth\n  SRC: %02X:%02X:%02X:%02X:%02X:%02X\n  DST: %02X:%02X:%02X:%02X:%02X:%02X\n", 
             eth->ether_dhost[0], eth->ether_dhost[1], eth->ether_dhost[2], eth->ether_dhost[3], eth->ether_dhost[4], eth->ether_dhost[5], 
