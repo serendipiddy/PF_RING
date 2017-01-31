@@ -261,8 +261,8 @@ void process_ofp(struct ofp_header * ofp) {
         // printf("  tot_len(%hu) match_len(%hu)\n", ntohs(ofp->length), ntohs(m->length));
         // &((char *)m->oxm_fields)[13];
         printf("Match MAC_DST: %02X:%02X:%02X:%02X:%02X:%02X\n",
-            ((char *)m->oxm_fields)[13], ((char *)m->oxm_fields)[14], ((char *)m->oxm_fields)[15], 
-            ((char *)m->oxm_fields)[16], ((char *)m->oxm_fields)[17], ((char *)m->oxm_fields)[18]);
+            ((char *)m->oxm_fields)[12], ((char *)m->oxm_fields)[13], ((char *)m->oxm_fields)[14], 
+            ((char *)m->oxm_fields)[15], ((char *)m->oxm_fields)[16], ((char *)m->oxm_fields)[17]);
     }
     else if (ofp->type == OFPT_ECHO_REQUEST) {
         printf("ECHO_REQUEST\n");
