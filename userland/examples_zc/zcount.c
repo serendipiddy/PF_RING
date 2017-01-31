@@ -240,7 +240,7 @@ void process_ofp(struct ofp_header * ofp) {
     
     if (ofp->type == OFPT_PACKET_IN) {
         struct ofp_packet_in* p = (struct ofp_packet_in*) ofp;
-        printf("PKT_IN: xid(%u) len(%u)\n", ofp->xid), p->total_len;
+        printf("PKT_IN: xid(%u) len(%hu)\n", ofp->xid), p->total_len;
         struct ofp_match* match = &p->match;
         char oxm_values[match->length-3];
         memcpy(oxm_values, match->oxm_fields, match->length-4);
