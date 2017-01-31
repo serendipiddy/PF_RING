@@ -240,12 +240,14 @@ void process_ofp(struct ofp_header * ofp) {
     
     if (ofp->type == OFPT_PACKET_IN) {
         struct ofp_packet_in* p = (struct ofp_packet_in*) ofp;
-        printf("addresses: pktin(0x%X) ofp(0x%X)\n", p, ofp);
         printf("PKT_IN: xid(%u) len(%hu)\n", ofp->xid), p->total_len;
+        printf("addresses: pktin(0x%X) ofp(0x%X)\n", p, ofp);
+        printf("addresses: pktin(0x%X) ofp(0x%X)\n", p->header->type, p->type);
+        printf("addresses: pktin(0x%X) ofp(0x%X)\n", &p->header->type, &p->type);
         
         printf("PKT_IN:\n  %02X%02X%02X%02X%02X%02X\n  %02X%02X%02X%02X%02X%02X\n", 
-            p[0], p[1], p[2], p[3], p[4],  p[5], 
-            p[6], p[7], p[8], p[9], p[10], p[11]);
+            *( ((char *) p) ), *( ((char *) p) +1), *( ((char *) p) +2), *( ((char *) p) +3), *( ((char *) p) +4), *( ((char *) p) +5), 
+            *( ((char *) p) +6), *( ((char *) p) +7), *( ((char *) p) +8), *( ((char *) p) +9), *( ((char *) p) +10), *( ((char *) p) +11) );
         
         struct ofp_match* match = &p->match;
         char oxm_values[match->length-3];
