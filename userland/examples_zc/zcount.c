@@ -82,7 +82,6 @@ int use_hardware = 0;
 
 #include "openflow.h"
 #include <net/ethernet.h>
-#include <netinet/tcp.h>
 
 // struct ofp_header {
     // u_int8_t version;
@@ -298,7 +297,6 @@ void *packet_consumer_thread(void *user) {
   lb_it->id = 0;
   int tcp_hdr_idx = 50;
   struct ofp_header* ofp;
-  struct tcphdr * tcp_hdr;
 
   if (bind_core >= 0)
     bind2core(bind_core);
