@@ -81,6 +81,7 @@ int pps = -1;
 int use_hardware = 0;
 
 #include "openflow.h"
+#indlude <net/ethernet.h>
 
 // struct ofp_header {
     // u_int8_t version;
@@ -244,9 +245,12 @@ void process_ofp(struct ofp_header * ofp) {
         char oxm_values[match->length-3];
         memcpy(oxm_values, match->oxm_fields, match->length-4);
         oxm_values[match->length-3] = '\0';
-        printf("PKT MATCH: %s", oxm_values);
+        // printf("PKT MATCH: %s\n", oxm_values);
         
-        // * eth_pkt = p+32;
+        struct ether_header* eth = p+32;
+        printf("InnerEth SRC: %02X:%02X:%02X:%02X:%02X:%02X DST:%02X:%02X:%02X:%02X:%02X:%02X\n", 
+            eth[0], eth[1], eth[2], eth[3], eth[4], eth[5], 
+            eth[6], eth[7], eth[8], eth[9], eth[10], eth[11]);
     }
     else if (ofp->type == OFPT_PACKET_OUT ) {
         printf("PKT_OUT: xid(%u)\n", ofp->xid);
