@@ -256,7 +256,10 @@ void process_ofp(struct ofp_header * ofp) {
     }
     else if (ofp->type == OFPT_FLOW_MOD ) {
         printf("FLOW_MOD: xid(%u)\n", ofp->xid);
+        struct ofp_match* m = (struct ofp_match*) &((struct ofp_flow_mod *)ofp)->match ;
         
+        printf("tot_len(%hu) match_len(%hu)\n", ofp->length);
+        m->oxm_fields;
     }
     else if (ofp->type == OFPT_ECHO_REQUEST) {
         printf("ECHO_REQUEST\n");
@@ -297,17 +300,13 @@ void *packet_consumer_thread(void *user) {
           memcpy(&lb_it->dst, &pkt_data[16], 6);
           memcpy(&lb_it->src, &pkt_data[22], 6);
           
-          // memcpy(&lb_it->hi.type, &pkt_data[50 + shift*8], 50);
-          // ofp_hdr = &pkt_data[50 + 20];
-          // lb_it->hi.type = ofp_hdr->type;
-          
-          // // memcpy(&lb_it->ofp, &pkt_data[50 + 32], 8); // this WORKS
+          // // memcpy(&lb_it->ofp, &pkt_data[50 + 32], 8); // this WORKS don't delete.. just in case..
 
           ofp = (struct ofp_header*) &pkt_data[tcp_hdr + 32]; // start the ofp header after a tcp 8*4=32 byte option-shift
           if (ofp->version == 4) {
               process_ofp(ofp);
           }
-          memcpy(&lb_it->ofp, ofp, 8); // this WORKS
+          memcpy(&lb_it->ofp, ofp, 8); // this gets the 64 bit ofp header 
           
           // the below function is not using the 'hwts'
           // get_packet_timestamp(lb_it);
