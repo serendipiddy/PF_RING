@@ -313,7 +313,7 @@ void *packet_consumer_thread(void *user) {
           memcpy(&lb_it->hwts, &pkt_data[8], 6);
           memcpy(&lb_it->dst, &pkt_data[16], 6);
           memcpy(&lb_it->src, &pkt_data[22], 6);
-          memset(&lb_it->ofp, f, 6);
+          memset(&lb_it->ofp, 0xf, 6);
           
           // // memcpy(&lb_it->ofp, &pkt_data[50 + 32], 8); // this WORKS don't delete.. just in case..
 
