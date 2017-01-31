@@ -81,7 +81,7 @@ int pps = -1;
 int use_hardware = 0;
 
 #include "openflow.h"
-#indlude <net/ethernet.h>
+#include <net/ethernet.h>
 
 // struct ofp_header {
     // u_int8_t version;
