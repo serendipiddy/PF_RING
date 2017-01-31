@@ -318,7 +318,7 @@ void *packet_consumer_thread(void *user) {
           lb_it->ack = 0;
           
           // // memcpy(&lb_it->ofp, &pkt_data[50 + 32], 8); // this WORKS don't delete.. just in case..
-          tcp_hdr = &pkt_data[tcp_hdr_idx];
+          tcp_hdr =  (struct tcphdr *) &pkt_data[tcp_hdr_idx];
           if (tcp_hdr->ack) lb_it->ack = 1;
           ofp = (struct ofp_header*) &pkt_data[tcp_hdr_idx + 32]; // start the ofp header after a tcp 8*4=32 byte option-shift
           if (ofp->version == 4) {
