@@ -303,7 +303,7 @@ void *packet_consumer_thread(void *user) {
           
           // // memcpy(&lb_it->ofp, &pkt_data[50 + 32], 8); // this WORKS
 
-          ofp = &pkt_data[50 + 32]; // start the ofp header after a tcp 8*4=32 byte option-shift
+          ofp = &pkt_data[tcp_hdr + 32]; // start the ofp header after a tcp 8*4=32 byte option-shift
           if (ofp->version == 4) {
               process_ofp(ofp);
           }
