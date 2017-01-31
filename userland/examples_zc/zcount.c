@@ -258,8 +258,8 @@ void process_ofp(struct ofp_header * ofp) {
         struct ether_header* eth = p+sizeof(struct ofp_packet_in) + 2 /* 2 padding bytes */;
         printf("addresses: pktin(0x%X) eth(0x%X)\n", p, eth);
         printf("InnerEth\n  SRC: %02X:%02X:%02X:%02X:%02X:%02X\n  DST: %02X:%02X:%02X:%02X:%02X:%02X\n", 
-            eth.ether_dhost[0], eth.ether_dhost[1], eth.ether_dhost[2], eth.ether_dhost[3], eth.ether_dhost[4], eth.ether_dhost[5], 
-            eth.ether_shost[6], eth.ether_shost[7], eth.ether_shost[8], eth.ether_shost[9], eth.ether_shost[10], eth.ether_shost[11]);
+            eth->ether_dhost[0], eth->ether_dhost[1], eth->ether_dhost[2], eth->ether_dhost[3], eth->ether_dhost[4], eth->ether_dhost[5], 
+            eth->ether_shost[6], eth->ether_shost[7], eth->ether_shost[8], eth->ether_shost[9], eth->ether_shost[10], eth->ether_shost[11]);
     }
     else if (ofp->type == OFPT_PACKET_OUT ) {
         printf("PKT_OUT: xid(%u)\n", ofp->xid);
