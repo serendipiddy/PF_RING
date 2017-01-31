@@ -319,7 +319,7 @@ void *packet_consumer_thread(void *user) {
           if (ofp->version == 4) {
               process_ofp(ofp, &lb_it->ofp);
           }
-          memcpy(&lb_it->ofp, ofp, 8); // this gets the 64 bit ofp header 
+          // memcpy(&lb_it->ofp, ofp, 8); // this gets the 64 bit ofp header 
           
           // the below function is not using the 'hwts'
           // get_packet_timestamp(lb_it);
