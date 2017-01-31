@@ -639,22 +639,22 @@ void *send_traffic(void *user) {
         // buffers[buffer_id]->len = append_packet_ts(buffer, buffers[buffer_id]->len);
     
       /* Set destination address with a 16 bit ID */
-  // matrix_buffer[5]++;
-  // if (matrix_buffer[5] == 0x00) {
-      // matrix_buffer[4]++;
-      // if (matrix_buffer[4] == 0x00) {
-          // matrix_buffer[3]++;
-          // if (matrix_buffer[3] == 0x00) {
-            // matrix_buffer[2]++;
-          // }
-      // }
-  // }
-      buffer[0] = 0xa9; 
-      buffer[1] = 0xb9; 
-      buffer[2] = 0xc9; 
-      buffer[3] = 0xd9; 
-      buffer[4] = 0xe9; 
-      buffer[5] = 0xf9; 
+      matrix_buffer[5]++;
+      if (matrix_buffer[5] == 0x00) {
+          matrix_buffer[4]++;
+          if (matrix_buffer[4] == 0x00) {
+              matrix_buffer[3]++;
+              if (matrix_buffer[3] == 0x00) {
+                matrix_buffer[2]++;
+              }
+          }
+      }
+      // buffer[0] = 0xa9; 
+      // buffer[1] = 0xb9; 
+      // buffer[2] = 0xc9; 
+      // buffer[3] = 0xd9; 
+      // buffer[4] = 0xe9; 
+      // buffer[5] = 0xf9; 
     
       if (use_lock_buffer)
       {
