@@ -283,6 +283,7 @@ int process_ofp(struct ofp_header * ofp, char * output) {
             return 1;
         default:
             printf("Unexpected OFP type: type(%u) xid(%u)\n", ofp->type, ofp->xid);
+            *((u_int64_t *)output) = 0xfcffffffffff;
             return 0;
     }
 }
@@ -316,15 +317,8 @@ void *packet_consumer_thread(void *user) {
           memcpy(&lb_it->dst, &pkt_data[16], 6);
           memcpy(&lb_it->src, &pkt_data[22], 6);
           memset(&lb_it->ofp, 0xff, 6);
-          lb_it->ack = 0;
           
           // // memcpy(&lb_it->ofp, &pkt_data[50 + 32], 8); // this WORKS don't delete.. just in case..
-          tcp_hdr =  (struct tcphdr *) &pkt_data[tcp_hdr_idx];
-          printf("0x%X", *( ((char *)tcp_hdr)-11));
-          if (ntohs(*( ((char *)tcp_hdr)-11)) == 0x06 /* Is TCP */ && !((u_int8_t) tcp_hdr->th_flags) && TH_PUSH) {
-              /* is TCP and the PUSH flag isn't set */
-              lb_it->ack = 1;
-          }
           ofp = (struct ofp_header*) &pkt_data[tcp_hdr_idx + 32]; // start the ofp header after a tcp 8*4=32 byte option-shift
           if (ofp->version == 4) {
               process_ofp(ofp, (char *) &lb_it->ofp);
