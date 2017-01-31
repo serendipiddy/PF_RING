@@ -241,7 +241,7 @@ void process_ofp(struct ofp_header * ofp) {
         printf("PKT_IN: xid(%u)\n", ofp->xid);
         struct ofp_packet_in* p = (struct ofp_packet_in*) ofp;
         struct ofp_match* match = &p->match;
-        char * oxm_values[match->length-3];
+        char oxm_values[match->length-3];
         memcpy(oxm_values, match->oxm_fields, match->length-4);
         oxm_values[match->length-3] = '\0';
         printf("PKT MATCH: %s", oxm_values);
