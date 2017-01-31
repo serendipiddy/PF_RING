@@ -247,7 +247,7 @@ void process_ofp(struct ofp_header * ofp) {
             eth->ether_shost[0], eth->ether_shost[1], eth->ether_shost[2], eth->ether_shost[3], eth->ether_shost[4], eth->ether_shost[5]);
     }
     else if (ofp->type == OFPT_PACKET_OUT ) {
-        printf("PKT_OUT: xid(%u) - ", ofp->xid);
+        printf("PKT_OUT: ", ofp->xid);
         struct ofp_packet_out* p = (struct ofp_packet_out*) ofp;
         struct ether_header* eth = (struct ether_header*) (((char*)p) + sizeof(struct ofp_packet_out) + ntohs(p->actions_len));
         printf("Encapsulated MAC DST: %02X:%02X:%02X:%02X:%02X:%02X SRC: %02X:%02X:%02X:%02X:%02X:%02X\n", 
@@ -255,11 +255,14 @@ void process_ofp(struct ofp_header * ofp) {
             eth->ether_shost[0], eth->ether_shost[1], eth->ether_shost[2], eth->ether_shost[3], eth->ether_shost[4], eth->ether_shost[5]);
     }
     else if (ofp->type == OFPT_FLOW_MOD ) {
-        printf("FLOW_MOD: xid(%u)\n", ofp->xid);
+        printf("FLOW_MOD: ", ofp->xid);
         struct ofp_match* m = (struct ofp_match*) &((struct ofp_flow_mod *)ofp)->match ;
         
-        printf("  tot_len(%hu) match_len(%hu)\n", ntohs(ofp->length), ntohs(m->length));
-        m->oxm_fields;
+        // printf("  tot_len(%hu) match_len(%hu)\n", ntohs(ofp->length), ntohs(m->length));
+        // &((char *)m->oxm_fields)[13];
+        printf("Match MAC_DST: %02X:%02X:%02X:%02X:%02X:%02X\n",
+            ((char *)m->oxm_fields)[13], ((char *)m->oxm_fields)[14], ((char *)m->oxm_fields)[15], 
+            ((char *)m->oxm_fields)[16], ((char *)m->oxm_fields)[17], ((char *)m->oxm_fields)[18]);
     }
     else if (ofp->type == OFPT_ECHO_REQUEST) {
         printf("ECHO_REQUEST\n");
