@@ -245,18 +245,18 @@ void process_ofp(struct ofp_header * ofp, char * output) {
     switch (ofp->type) {
         
         case OFPT_PACKET_IN:
-            ofpP = (struct ofp_packet_in*) ofp;
-            ofpEth = (struct ether_header*) (((char*)p) + (ntohs(ofp->length) - ntohs(p->total_len)));
-            memcpy(output, &ofpEth->ether_dhost, 6)
+            ofpPin = (struct ofp_packet_in*) ofp;
+            ofpEth = (struct ether_header*) (((char*)ofpPin) + (ntohs(ofp->length) - ntohs(ofpPin->total_len)));
+            memcpy(output, &ofpEth->ether_dhost, 6);
             
             // printf("PKT_IN: Encapsulated MAC DST: %02X:%02X:%02X:%02X:%02X:%02X"); // SRC: %02X:%02X:%02X:%02X:%02X:%02X\n", 
                 // eth->ether_dhost[0], eth->ether_dhost[1], eth->ether_dhost[2], eth->ether_dhost[3], eth->ether_dhost[4], eth->ether_dhost[5]);
                 // eth->ether_shost[0], eth->ether_shost[1], eth->ether_shost[2], eth->ether_shost[3], eth->ether_shost[4], eth->ether_shost[5]);
             return;
         case OFPT_PACKET_OUT:
-            ofpP = (struct ofp_packet_out*) ofp;
-            ofpEth = (struct ether_header*) (((char*)p) + sizeof(struct ofp_packet_out) + ntohs(p->actions_len));
-            memcpy(output, &ofpEth->ether_dhost, 6)
+            ofpPout = (struct ofp_packet_out*) ofp;
+            ofpEth = (struct ether_header*) (((char*)ofpPout) + sizeof(struct ofp_packet_out) + ntohs(ofpPout->actions_len));
+            memcpy(output, &ofpEth->ether_dhost, 6);
             
             // printf("PKT_OUT: Encapsulated MAC DST: %02X:%02X:%02X:%02X:%02X:%02X\n"); // SRC: %02X:%02X:%02X:%02X:%02X:%02X\n", 
                 // eth->ether_dhost[0], eth->ether_dhost[1], eth->ether_dhost[2], eth->ether_dhost[3], eth->ether_dhost[4], eth->ether_dhost[5]);
@@ -264,7 +264,7 @@ void process_ofp(struct ofp_header * ofp, char * output) {
             return;
         case OFPT_FLOW_MOD:
             ofpMatch = (struct ofp_match*) &((struct ofp_flow_mod *)ofp)->match ;
-            memcpy(output, &((char *)ofpMatch->oxm_fields)[12], 6)
+            memcpy(output, &((char *)ofpMatch->oxm_fields)[12], 6);
             
             // printf("MATCH: MAC_DST: %02X:%02X:%02X:%02X:%02X:%02X\n",
                 // ((char *)m->oxm_fields)[12], ((char *)m->oxm_fields)[13], ((char *)m->oxm_fields)[14], 
@@ -274,7 +274,7 @@ void process_ofp(struct ofp_header * ofp, char * output) {
             // printf("ECHO_REQUEST\n");
         case OFPT_ECHO_REPLY:
             // printf("ECHO_REPLY\n");
-            memcpy(output, "ECH", 6)
+            memcpy(output, "ECH", 6);
             return;
         default:
             printf("Unexpected OFP type: type(%u) xid(%u)\n", ofp->type, ofp->xid);
