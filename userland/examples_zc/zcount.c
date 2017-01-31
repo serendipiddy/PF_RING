@@ -294,8 +294,9 @@ void *packet_consumer_thread(void *user) {
   /* lock buffer */
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
-  int tcp_hdr = 50;
+  int tcp_hdr_idx = 50;
   struct ofp_header* ofp;
+  struct tcphdr * tcp_hdr;
 
   if (bind_core >= 0)
     bind2core(bind_core);
@@ -314,10 +315,12 @@ void *packet_consumer_thread(void *user) {
           memcpy(&lb_it->dst, &pkt_data[16], 6);
           memcpy(&lb_it->src, &pkt_data[22], 6);
           memset(&lb_it->ofp, 0xff, 6);
+          lb_it->ack = 0;
           
           // // memcpy(&lb_it->ofp, &pkt_data[50 + 32], 8); // this WORKS don't delete.. just in case..
-
-          ofp = (struct ofp_header*) &pkt_data[tcp_hdr + 32]; // start the ofp header after a tcp 8*4=32 byte option-shift
+          tcp_hdr = &pkt_data[tcp_hdr_idx];
+          if (tcp_hdr->ack) lb_it->ack = 1;
+          ofp = (struct ofp_header*) &pkt_data[tcp_hdr_idx + 32]; // start the ofp header after a tcp 8*4=32 byte option-shift
           if (ofp->version == 4) {
               process_ofp(ofp, &lb_it->ofp);
           }
