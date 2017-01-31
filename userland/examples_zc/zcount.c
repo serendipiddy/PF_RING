@@ -320,7 +320,7 @@ void *packet_consumer_thread(void *user) {
           
           // // memcpy(&lb_it->ofp, &pkt_data[50 + 32], 8); // this WORKS don't delete.. just in case..
           tcp_hdr =  (struct tcphdr *) &pkt_data[tcp_hdr_idx];
-          if (*( ((char *)tcp_hdr)-11) == 0x06 /* Is TCP */ && !((u_int8_t) tcp_hdr->th_flags) && TH_PUSH) {
+          if (ntohs(*( ((char *)tcp_hdr)-11)) == 0x06 /* Is TCP */ && !((u_int8_t) tcp_hdr->th_flags) && TH_PUSH) {
               /* is TCP and the PUSH flag isn't set */
               lb_it->ack = 1;
           }
