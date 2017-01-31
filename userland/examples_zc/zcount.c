@@ -240,7 +240,7 @@ void process_ofp(struct ofp_header * ofp) {
     
     if (ofp->type == OFPT_PACKET_IN) {
         struct ofp_packet_in* p = (struct ofp_packet_in*) ofp;
-        printf("PKT_IN: xid(%u) hdr_len(%%hu) pkt_len(%hu)\n", ofp->xid, ntohs(ofp->length), ntohs(p->total_len));
+        printf("PKT_IN: xid(%u) hdr_len(%hu) pkt_len(%hu)\n", ofp->xid, ntohs(ofp->length), ntohs(p->total_len));
         printf("addresses: pktin(0x%X) ofp(0x%X)\n", p, ofp);
         printf("addresses: pktin(0x%X) ofp(0x%X)\n", p->header.type, ofp->type);
         printf("addresses: pktin(0x%X)\n", p->total_len);
