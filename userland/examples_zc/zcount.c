@@ -242,8 +242,7 @@ void process_ofp(struct ofp_header * ofp) {
         struct ofp_packet_in* p = (struct ofp_packet_in*) ofp;
         // struct ether_header* eth = ((char*)p)+sizeof(struct ofp_packet_in) + 2 /* 2 padding bytes */ + (0 /* oxm */;
         struct ether_header* eth = ((char*)p) + (ntohs(ofp->length) - ntohs(p->total_len));
-        printf("addresses: pktin(0x%X) eth(0x%X)\n", p, eth);
-        printf("InnerEth\n  SRC: %02X:%02X:%02X:%02X:%02X:%02X\n  DST: %02X:%02X:%02X:%02X:%02X:%02X\n", 
+        printf("Encapsulated MAC SRC: %02X:%02X:%02X:%02X:%02X:%02X DST: %02X:%02X:%02X:%02X:%02X:%02X\n", 
             eth->ether_dhost[0], eth->ether_dhost[1], eth->ether_dhost[2], eth->ether_dhost[3], eth->ether_dhost[4], eth->ether_dhost[5], 
             eth->ether_shost[0], eth->ether_shost[1], eth->ether_shost[2], eth->ether_shost[3], eth->ether_shost[4], eth->ether_shost[5]);
     }
