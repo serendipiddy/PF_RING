@@ -242,12 +242,12 @@ void process_ofp(struct ofp_header * ofp) {
         struct ofp_packet_in* p = (struct ofp_packet_in*) ofp;
         // struct ether_header* eth = ((char*)p)+sizeof(struct ofp_packet_in) + 2 /* 2 padding bytes */ + (0 /* oxm */;
         struct ether_header* eth = (struct ether_header*) (((char*)p) + (ntohs(ofp->length) - ntohs(p->total_len)));
-        printf("Encapsulated MAC SRC: %02X:%02X:%02X:%02X:%02X:%02X DST: %02X:%02X:%02X:%02X:%02X:%02X\n", 
+        printf("PKT_IN: Encapsulated MAC SRC: %02X:%02X:%02X:%02X:%02X:%02X DST: %02X:%02X:%02X:%02X:%02X:%02X\n", 
             eth->ether_dhost[0], eth->ether_dhost[1], eth->ether_dhost[2], eth->ether_dhost[3], eth->ether_dhost[4], eth->ether_dhost[5], 
             eth->ether_shost[0], eth->ether_shost[1], eth->ether_shost[2], eth->ether_shost[3], eth->ether_shost[4], eth->ether_shost[5]);
     }
     else if (ofp->type == OFPT_PACKET_OUT ) {
-        printf("PKT_OUT: xid(%u)\n", ofp->xid);
+        printf("PKT_OUT: xid(%u) - ", ofp->xid);
         struct ofp_packet_out* p = (struct ofp_packet_out*) ofp;
         struct ether_header* eth = (struct ether_header*) (((char*)p) + sizeof(struct ofp_packet_out) + ntohs(p->actions_len));
         printf("Encapsulated MAC SRC: %02X:%02X:%02X:%02X:%02X:%02X DST: %02X:%02X:%02X:%02X:%02X:%02X\n", 
@@ -258,7 +258,7 @@ void process_ofp(struct ofp_header * ofp) {
         printf("FLOW_MOD: xid(%u)\n", ofp->xid);
         struct ofp_match* m = (struct ofp_match*) &((struct ofp_flow_mod *)ofp)->match ;
         
-        printf("tot_len(%hu) match_len(%hu)\n", ntohs(ofp->length), ntohs(m->length));
+        printf("  tot_len(%hu) match_len(%hu)\n", ntohs(ofp->length), ntohs(m->length));
         m->oxm_fields;
     }
     else if (ofp->type == OFPT_ECHO_REQUEST) {
