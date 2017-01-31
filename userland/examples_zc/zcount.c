@@ -234,44 +234,51 @@ void print_packet(pfring_zc_pkt_buff *buffer) {
 }
 
 /* *************************************** */
-
-void process_ofp(struct ofp_header * ofp) {
-    printf("OFP: type(%u) xid(%u) - ", ofp->type, ofp->xid);
+struct ether_header* ofpEth;
+struct ofp_packet_in* ofpPin;
+struct ofp_packet_out* ofpPout;
+struct ofp_match* ofpMatch;
+/* read the openflow header and extract 6 bytes of identifiable info from it */
+void process_ofp(struct ofp_header * ofp, char * output) {
+    // printf("OFP: type(%u) xid(%u) - ", ofp->type, ofp->xid);
     
-    if (ofp->type == OFPT_PACKET_IN) {
-        struct ofp_packet_in* p = (struct ofp_packet_in*) ofp;
-        // struct ether_header* eth = ((char*)p)+sizeof(struct ofp_packet_in) + 2 /* 2 padding bytes */ + (0 /* oxm */;
-        struct ether_header* eth = (struct ether_header*) (((char*)p) + (ntohs(ofp->length) - ntohs(p->total_len)));
-        printf("PKT_IN: Encapsulated MAC SRC: %02X:%02X:%02X:%02X:%02X:%02X DST: %02X:%02X:%02X:%02X:%02X:%02X\n", 
-            eth->ether_dhost[0], eth->ether_dhost[1], eth->ether_dhost[2], eth->ether_dhost[3], eth->ether_dhost[4], eth->ether_dhost[5], 
-            eth->ether_shost[0], eth->ether_shost[1], eth->ether_shost[2], eth->ether_shost[3], eth->ether_shost[4], eth->ether_shost[5]);
-    }
-    else if (ofp->type == OFPT_PACKET_OUT ) {
-        printf("PKT_OUT: ", ofp->xid);
-        struct ofp_packet_out* p = (struct ofp_packet_out*) ofp;
-        struct ether_header* eth = (struct ether_header*) (((char*)p) + sizeof(struct ofp_packet_out) + ntohs(p->actions_len));
-        printf("Encapsulated MAC DST: %02X:%02X:%02X:%02X:%02X:%02X SRC: %02X:%02X:%02X:%02X:%02X:%02X\n", 
-            eth->ether_dhost[0], eth->ether_dhost[1], eth->ether_dhost[2], eth->ether_dhost[3], eth->ether_dhost[4], eth->ether_dhost[5], 
-            eth->ether_shost[0], eth->ether_shost[1], eth->ether_shost[2], eth->ether_shost[3], eth->ether_shost[4], eth->ether_shost[5]);
-    }
-    else if (ofp->type == OFPT_FLOW_MOD ) {
-        printf("FLOW_MOD: ", ofp->xid);
-        struct ofp_match* m = (struct ofp_match*) &((struct ofp_flow_mod *)ofp)->match ;
+    switch (ofp->type) {
         
-        // printf("  tot_len(%hu) match_len(%hu)\n", ntohs(ofp->length), ntohs(m->length));
-        // &((char *)m->oxm_fields)[13];
-        printf("Match MAC_DST: %02X:%02X:%02X:%02X:%02X:%02X\n",
-            ((char *)m->oxm_fields)[12], ((char *)m->oxm_fields)[13], ((char *)m->oxm_fields)[14], 
-            ((char *)m->oxm_fields)[15], ((char *)m->oxm_fields)[16], ((char *)m->oxm_fields)[17]);
-    }
-    else if (ofp->type == OFPT_ECHO_REQUEST) {
-        printf("ECHO_REQUEST\n");
-    }
-    else if (ofp->type == OFPT_ECHO_REPLY ) {
-        printf("ECHO_REPLY\n");
-    }
-    else {
-        printf("Unexpected OFP type: type(%u) xid(%u)\n", ofp->type, ofp->xid);
+        case OFPT_PACKET_IN:
+            ofpP = (struct ofp_packet_in*) ofp;
+            ofpEth = (struct ether_header*) (((char*)p) + (ntohs(ofp->length) - ntohs(p->total_len)));
+            memcpy(output, &ofpEth->ether_dhost, 6)
+            
+            // printf("PKT_IN: Encapsulated MAC DST: %02X:%02X:%02X:%02X:%02X:%02X"); // SRC: %02X:%02X:%02X:%02X:%02X:%02X\n", 
+                // eth->ether_dhost[0], eth->ether_dhost[1], eth->ether_dhost[2], eth->ether_dhost[3], eth->ether_dhost[4], eth->ether_dhost[5]);
+                // eth->ether_shost[0], eth->ether_shost[1], eth->ether_shost[2], eth->ether_shost[3], eth->ether_shost[4], eth->ether_shost[5]);
+            return;
+        case OFPT_PACKET_OUT:
+            ofpP = (struct ofp_packet_out*) ofp;
+            ofpEth = (struct ether_header*) (((char*)p) + sizeof(struct ofp_packet_out) + ntohs(p->actions_len));
+            memcpy(output, &ofpEth->ether_dhost, 6)
+            
+            // printf("PKT_OUT: Encapsulated MAC DST: %02X:%02X:%02X:%02X:%02X:%02X\n"); // SRC: %02X:%02X:%02X:%02X:%02X:%02X\n", 
+                // eth->ether_dhost[0], eth->ether_dhost[1], eth->ether_dhost[2], eth->ether_dhost[3], eth->ether_dhost[4], eth->ether_dhost[5]);
+                // eth->ether_shost[0], eth->ether_shost[1], eth->ether_shost[2], eth->ether_shost[3], eth->ether_shost[4], eth->ether_shost[5]);
+            return;
+        case OFPT_FLOW_MOD:
+            ofpMatch = (struct ofp_match*) &((struct ofp_flow_mod *)ofp)->match ;
+            memcpy(output, &((char *)ofpMatch->oxm_fields)[12], 6)
+            
+            // printf("MATCH: MAC_DST: %02X:%02X:%02X:%02X:%02X:%02X\n",
+                // ((char *)m->oxm_fields)[12], ((char *)m->oxm_fields)[13], ((char *)m->oxm_fields)[14], 
+                // ((char *)m->oxm_fields)[15], ((char *)m->oxm_fields)[16], ((char *)m->oxm_fields)[17]);
+            return;
+        case OFPT_ECHO_REQUEST:
+            // printf("ECHO_REQUEST\n");
+        case OFPT_ECHO_REPLY:
+            // printf("ECHO_REPLY\n");
+            memcpy(output, "ECH", 6)
+            return;
+        default:
+            printf("Unexpected OFP type: type(%u) xid(%u)\n", ofp->type, ofp->xid);
+            return;
     }
 }
 
@@ -307,7 +314,7 @@ void *packet_consumer_thread(void *user) {
 
           ofp = (struct ofp_header*) &pkt_data[tcp_hdr + 32]; // start the ofp header after a tcp 8*4=32 byte option-shift
           if (ofp->version == 4) {
-              process_ofp(ofp);
+              process_ofp(ofp, &lb_it->ofp);
           }
           memcpy(&lb_it->ofp, ofp, 8); // this gets the 64 bit ofp header 
           
