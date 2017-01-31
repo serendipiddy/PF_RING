@@ -274,11 +274,11 @@ void process_ofp(struct ofp_header * ofp, char * output) {
             return;
         case OFPT_ECHO_REQUEST:
             // printf("ECHO_REQUEST\n");
-            *((u_int64_t)output) = 0xffffffffffff;
+            *((u_int64_t *)output) = 0xffffffffffff;
             return;
         case OFPT_ECHO_REPLY:
             // printf("ECHO_REPLY\n");
-            *((u_int64_t)output) = 0xffffffffffff;
+            *((u_int64_t *)output) = 0xffffffffffff;
             return;
         default:
             printf("Unexpected OFP type: type(%u) xid(%u)\n", ofp->type, ofp->xid);
