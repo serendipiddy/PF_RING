@@ -239,11 +239,12 @@ struct ofp_packet_in* ofpPin;
 struct ofp_packet_out* ofpPout;
 struct ofp_match* ofpMatch;
 /* read the openflow header and extract 6 bytes of identifiable info from it */
-int process_ofp(struct ofp_header * ofp, char * output) {
+void process_ofp(struct ofp_header * ofp, char * output, char * type) {
     // printf("OFP: type(%u) xid(%u) - ", ofp->type, ofp->xid);
     
+    *type = ofp->type;
+    
     switch (ofp->type) {
-        
         case OFPT_PACKET_IN:
             ofpPin = (struct ofp_packet_in*) ofp;
             ofpEth = (struct ether_header*) (((char*)ofpPin) + (ntohs(ofp->length) - ntohs(ofpPin->total_len)));
@@ -252,17 +253,16 @@ int process_ofp(struct ofp_header * ofp, char * output) {
             // printf("PKT_IN: Encapsulated MAC DST: %02X:%02X:%02X:%02X:%02X:%02X"); // SRC: %02X:%02X:%02X:%02X:%02X:%02X\n", 
                 // eth->ether_dhost[0], eth->ether_dhost[1], eth->ether_dhost[2], eth->ether_dhost[3], eth->ether_dhost[4], eth->ether_dhost[5]);
                 // eth->ether_shost[0], eth->ether_shost[1], eth->ether_shost[2], eth->ether_shost[3], eth->ether_shost[4], eth->ether_shost[5]);
-            return 1;
+            break;
         case OFPT_PACKET_OUT:
             ofpPout = (struct ofp_packet_out*) ofp;
             ofpEth = (struct ether_header*) (((char*)ofpPout) + sizeof(struct ofp_packet_out) + ntohs(ofpPout->actions_len));
             // puts("pkt-out");
             memcpy(output, &ofpEth->ether_dhost, 6);
-            
             // printf("PKT_OUT: Encapsulated MAC DST: %02X:%02X:%02X:%02X:%02X:%02X\n"); // SRC: %02X:%02X:%02X:%02X:%02X:%02X\n", 
                 // eth->ether_dhost[0], eth->ether_dhost[1], eth->ether_dhost[2], eth->ether_dhost[3], eth->ether_dhost[4], eth->ether_dhost[5]);
                 // eth->ether_shost[0], eth->ether_shost[1], eth->ether_shost[2], eth->ether_shost[3], eth->ether_shost[4], eth->ether_shost[5]);
-            return 1;
+            break;
         case OFPT_FLOW_MOD:
             ofpMatch = (struct ofp_match*) &((struct ofp_flow_mod *)ofp)->match ;
             // puts("flw-mod");
@@ -271,19 +271,19 @@ int process_ofp(struct ofp_header * ofp, char * output) {
             // printf("MATCH: MAC_DST: %02X:%02X:%02X:%02X:%02X:%02X\n",
                 // ((char *)m->oxm_fields)[12], ((char *)m->oxm_fields)[13], ((char *)m->oxm_fields)[14], 
                 // ((char *)m->oxm_fields)[15], ((char *)m->oxm_fields)[16], ((char *)m->oxm_fields)[17]);
-            return 1;
+            break;
         case OFPT_ECHO_REQUEST:
             // printf("ECHO_REQUEST\n");
-            *((u_int64_t *)output) = 0xfeffffffffff;
-            return 1;
+            // *((u_int64_t *)output) = 0xffffffffffff;
+            break;
         case OFPT_ECHO_REPLY:
             // printf("ECHO_REPLY\n");
-            *((u_int64_t *)output) = 0xfdffffffffff;
-            return 1;
+            // *((u_int64_t *)output) = 0xffffffffffff;
+            break;
         default:
-            printf("Unexpected OFP type: type(%u) xid(%u)\n", ofp->type, ofp->xid);
-            *((u_int64_t *)output) = 0xfcffffffffff;
-            return 0;
+            // printf("Unexpected OFP type: type(%u) xid(%u)\n", ofp->type, ofp->xid);
+            // *((u_int64_t *)output) = 0xffffffffffff;
+            break;
     }
 }
 
@@ -314,12 +314,13 @@ void *packet_consumer_thread(void *user) {
           memcpy(&lb_it->hwts, &pkt_data[8], 6);
           memcpy(&lb_it->dst, &pkt_data[16], 6);
           memcpy(&lb_it->src, &pkt_data[22], 6);
-          memset(&lb_it->ofp, 0xff, 6);
+          memset(&lb_it->ofp_mac, 0xff, 6);
+          memset(&lb_it->ofp_type, 0, 2);
           
           // // memcpy(&lb_it->ofp, &pkt_data[50 + 32], 8); // this WORKS don't delete.. just in case..
           ofp = (struct ofp_header*) &pkt_data[tcp_hdr_idx + 32]; // start the ofp header after a tcp 8*4=32 byte option-shift
           if (ofp->version == 4) {
-              process_ofp(ofp, (char *) &lb_it->ofp);
+              process_ofp(ofp, (char *) &lb_it->ofp_mac, (char *) &lb_it->ofp_type);
           }
           // memcpy(&lb_it->ofp, ofp, 8); // this gets the 64 bit ofp header 
           
