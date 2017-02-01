@@ -242,7 +242,8 @@ struct ofp_match* ofpMatch;
 void process_ofp(struct ofp_header * ofp, char * output, char * type) {
     // printf("OFP: type(%u) xid(%u) - ", ofp->type, ofp->xid);
     
-    *type = (u_int16_t)ofp->type;
+    *type = 0x0000;
+    *type = (u_int16_t) ofp->type;
     
     switch (ofp->type) {
         case OFPT_PACKET_IN:
