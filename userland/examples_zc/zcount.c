@@ -295,7 +295,7 @@ void *packet_consumer_thread(void *user) {
   /* lock buffer */
   struct id_time * lb_it = malloc( sizeof(struct id_time) ); 
   lb_it->id = 0;
-  lb_it->padding = 0x000000;
+  memset(lb_it->padding, 0, 3);
   int tcp_hdr_idx = 50;
   struct ofp_header* ofp;
 
