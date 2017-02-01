@@ -313,8 +313,8 @@ void *packet_consumer_thread(void *user) {
           u_char *pkt_data = pfring_zc_pkt_buff_data( buffers[lru], zq);
 
           lb_it->id++;
-          // memcpy(&lb_it->hwts, &pkt_data[8], 8);
-          lb_it->hwts = (u_int64_t) pkt_data[8];
+          memcpy(&lb_it->hwts, &pkt_data[8], 8);
+          // lb_it->hwts = (u_int64_t) pkt_data[8];
           memcpy(&lb_it->dst, &pkt_data[16], 6);
           memcpy(&lb_it->src, &pkt_data[22], 6);
           memset(&lb_it->ofp_mac, 0xff, 6);
