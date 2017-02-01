@@ -10,8 +10,8 @@ struct id_time {
     u_int32_t id;
     u_int32_t sec;
     u_int32_t nsec;
-    // u_char hwts[8];
-    u_int64_t hwts;
+    u_char hwts[8];
+    // u_int64_t hwts;
     u_char dst[6];
     u_char src[6];
     u_char ofp_mac[6];
