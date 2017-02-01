@@ -14,7 +14,7 @@ struct id_time {
     u_char dst[6];
     u_char src[6];
     u_char ofp_mac[6];
-    u_char ofp_type[2];
+    u_char ofp_type;
 };
 
 /* Lock buffer file pointer */
