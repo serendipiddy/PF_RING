@@ -333,13 +333,15 @@ void *packet_consumer_thread(void *user) {
           }
           // memcpy(&lb_it->ofp, ofp, 8); // this gets the 64 bit ofp header 
           
-          // the below function is not using the 'hwts'
-          // get_packet_timestamp(lb_it);
-          // lock_buffer_push (lb_buffer, lb_it); 
-          
-          /* get timestamp from packet instead */
-          lb_it->sec =  bswap_32(buffers[lru]->ts.tv_sec);
-          lb_it->nsec = bswap_32(buffers[lru]->ts.tv_nsec);
+          if(use_hardware) {
+              /* get timestamp from packet instead */
+              lb_it->sec =  bswap_32(buffers[lru]->ts.tv_sec);
+              lb_it->nsec = bswap_32(buffers[lru]->ts.tv_nsec);
+          }
+          else {
+              /* this is not using the 'hwts' instead use the ZC pulse clock */
+              get_packet_timestamp(lb_it);
+          }
 
           lock_buffer_push (lb_buffer, lb_it); 
       }
