@@ -299,6 +299,12 @@ void *packet_consumer_thread(void *user) {
   // lb_it->padding = 0xbaaa; // like a sheep
   int tcp_hdr_idx = 50;
   struct ofp_header* ofp;
+  int SKIP = 0;
+  
+  if(!use_hardware) { /* toggle zc, to skip hwts */
+      SKIP = 8;
+      tcp_hdr_idx -= SKIP;
+  }
 
   if (bind_core >= 0)
     bind2core(bind_core);
@@ -315,8 +321,8 @@ void *packet_consumer_thread(void *user) {
           lb_it->id++;
           memcpy(&lb_it->hwts, &pkt_data[8], 8);
           // lb_it->hwts = (u_int64_t) pkt_data[8];
-          memcpy(&lb_it->dst, &pkt_data[16], 6);
-          memcpy(&lb_it->src, &pkt_data[22], 6);
+          memcpy(&lb_it->dst, &pkt_data[16-SKIP], 6);
+          memcpy(&lb_it->src, &pkt_data[22-SKIP], 6);
           memset(&lb_it->ofp_mac, 0xff, 6);
           lb_it->ofp_type = 0xffff;
           
