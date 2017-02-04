@@ -302,7 +302,7 @@ void *packet_consumer_thread(void *user) {
   int SKIP = 0;
   
   if(!use_hardware) { /* toggle zc, to skip hwts */
-      SKIP = 9;
+      SKIP = 10;
       tcp_hdr_idx -= SKIP;
   }
 
@@ -319,8 +319,6 @@ void *packet_consumer_thread(void *user) {
           u_char *pkt_data = pfring_zc_pkt_buff_data( buffers[lru], zq);
 
           lb_it->id++;
-          memcpy(&lb_it->hwts, &pkt_data[8], 8);
-          // lb_it->hwts = (u_int64_t) pkt_data[8];
           memcpy(&lb_it->dst, &pkt_data[16-SKIP], 6);
           memcpy(&lb_it->src, &pkt_data[22-SKIP], 6);
           memset(&lb_it->ofp_mac, 0xff, 6);
@@ -334,8 +332,11 @@ void *packet_consumer_thread(void *user) {
           // memcpy(&lb_it->ofp, ofp, 8); // this gets the 64 bit ofp header 
           
           if(use_hardware) {
-              /* get timestamp from packet instead */
-              lb_it->sec =  bswap_32(buffers[lru]->ts.tv_sec);
+              /* get timestamp from packet instead*/
+              // hwts
+              memcpy(&lb_it->hwts, &pkt_data[8], 8);    
+              // system adjusted?
+              lb_it->sec =  bswap_32(buffers[lru]->ts.tv_sec);  
               lb_it->nsec = bswap_32(buffers[lru]->ts.tv_nsec);
           }
           else {
