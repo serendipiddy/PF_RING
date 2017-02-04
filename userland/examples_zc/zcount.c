@@ -302,7 +302,7 @@ void *packet_consumer_thread(void *user) {
   int SKIP = 0;
   
   if(!use_hardware) { /* toggle zc, to skip hwts */
-      SKIP = 10;
+      SKIP = 16;
       tcp_hdr_idx -= SKIP;
   }
 
