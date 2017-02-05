@@ -660,6 +660,8 @@ void *send_traffic(void *user) {
       {
           lb_it->id++;
           get_packet_timestamp(lb_it);
+          memcpy(&lb_it->dst, matrix_buffer, 6);
+          
           lock_buffer_push (lb_buffer, lb_it); 
       }
 
