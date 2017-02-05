@@ -43,7 +43,8 @@ struct lock_buffer_section {
 };
 
 # define NUMBER_OF_LOCKS 2
-# define MAX_ITEMS_TO_BUFFER 100000
+u_int32_t MAX_ITEMS_TO_BUFFER = 100000;
+
 void lock_buffer_init (struct lock_buffer * lb, size_t elem_size, size_t item_num) {
     int i;
     item_num = abs(item_num);

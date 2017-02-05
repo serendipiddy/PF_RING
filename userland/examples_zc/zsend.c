@@ -659,9 +659,9 @@ void *send_traffic(void *user) {
       if (use_lock_buffer)
       {
           lb_it->id++;
-          get_packet_timestamp(lb_it);
           memcpy(&lb_it->dst, matrix_buffer, 6);
           
+          get_packet_timestamp(lb_it);
           lock_buffer_push (lb_buffer, lb_it); 
       }
 
