@@ -618,6 +618,18 @@ void *send_traffic(void *user) {
     while (likely(!do_shutdown && (!num_to_send || numPkts < num_to_send))) {
       u_char *buffer = pfring_zc_pkt_buff_data(buffers[buffer_id], zq);
 
+      /* Set destination address with a 16 bit ID */
+      matrix_buffer[5]++;
+      if (matrix_buffer[5] == 0x00) {
+          matrix_buffer[4]++;
+          if (matrix_buffer[4] == 0x00) {
+              matrix_buffer[3]++;
+              if (matrix_buffer[3] == 0x00) {
+                matrix_buffer[2]++;
+              }
+          }
+      }
+      
       if(tosend) {
             buffers[buffer_id]->len = tosend->len, memcpy(buffer, tosend->pkt, tosend->len);
             tosend = tosend->next;
@@ -638,17 +650,6 @@ void *send_traffic(void *user) {
       // if (append_timestamp)
         // buffers[buffer_id]->len = append_packet_ts(buffer, buffers[buffer_id]->len);
     
-      /* Set destination address with a 16 bit ID */
-      matrix_buffer[5]++;
-      if (matrix_buffer[5] == 0x00) {
-          matrix_buffer[4]++;
-          if (matrix_buffer[4] == 0x00) {
-              matrix_buffer[3]++;
-              if (matrix_buffer[3] == 0x00) {
-                matrix_buffer[2]++;
-              }
-          }
-      }
       // buffer[0] = 0xa9; 
       // buffer[1] = 0xb9; 
       // buffer[2] = 0xc9; 
