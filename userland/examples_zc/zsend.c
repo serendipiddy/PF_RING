@@ -637,7 +637,7 @@ void *send_traffic(void *user) {
               }
           }
       }
-      printf("%02X:%02X:%02X\n", matrix_buffer[3] = 0x00, matrix_buffer[4] = 0x70, matrix_buffer[5] = 0x00);
+      printf("%02X:%02X:%02X\n", matrix_buffer[3], matrix_buffer[4], matrix_buffer[5]);
       
       if(tosend) {
             buffers[buffer_id]->len = tosend->len, memcpy(buffer, tosend->pkt, tosend->len);
