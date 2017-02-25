@@ -614,6 +614,14 @@ void *send_traffic(void *user) {
   else {
 #endif
     // struct timespec tn;
+    
+    buffer[0] = 0x00; 
+    buffer[1] = 0x00; 
+    buffer[2] = 0x00; 
+    buffer[3] = 0x00; 
+    buffer[4] = 0x70; 
+    buffer[5] = 0x00; 
+    
     /****** Packet API ******/
     while (likely(!do_shutdown && (!num_to_send || numPkts < num_to_send))) {
       u_char *buffer = pfring_zc_pkt_buff_data(buffers[buffer_id], zq);
