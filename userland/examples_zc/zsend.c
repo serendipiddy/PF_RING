@@ -615,12 +615,12 @@ void *send_traffic(void *user) {
 #endif
     // struct timespec tn;
     
-    buffer[0] = 0x00; 
-    buffer[1] = 0x00; 
-    buffer[2] = 0x00; 
-    buffer[3] = 0x00; 
-    buffer[4] = 0x70; 
-    buffer[5] = 0x00; 
+    matrix_buffer[0] = 0x00; 
+    matrix_buffer[1] = 0x00; 
+    matrix_buffer[2] = 0x00; 
+    matrix_buffer[3] = 0x00; 
+    matrix_buffer[4] = 0x70; 
+    matrix_buffer[5] = 0x00; 
     
     /****** Packet API ******/
     while (likely(!do_shutdown && (!num_to_send || numPkts < num_to_send))) {
