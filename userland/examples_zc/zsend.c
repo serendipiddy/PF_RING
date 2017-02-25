@@ -625,8 +625,10 @@ void *send_traffic(void *user) {
       /* Set destination address with a 16 bit ID */
       matrix_buffer[5]++;
       if (matrix_buffer[5] == 0x00) {
+          puts("upping 4");
           matrix_buffer[4]++;
           if (matrix_buffer[4] == 0x00) {
+              puts("upping 3");
               matrix_buffer[3]++;
               if (matrix_buffer[3] == 0x00) {
                 matrix_buffer[2]++;
