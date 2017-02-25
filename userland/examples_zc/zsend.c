@@ -226,6 +226,9 @@ static void forge_udp_packet(u_char *buffer, u_int idx) {
     for(i = 0; i < 6; i++) buffer[i] = 0x00; /* ethernet destination */
     for(i = 6; i < 12; i++) buffer[i] = i; /* ethernet source */
     buffer[12] = 0x08, buffer[13] = 0x00; /* ethtype to IP 0x0800 */
+    
+    buffer[4] = 0x70; 
+    buffer[5] = 0x00; 
 
     ip_header = (struct ip_header*) &buffer[sizeof(struct ether_header)];
     ip_header->ihl = 5;
@@ -614,13 +617,6 @@ void *send_traffic(void *user) {
   else {
 #endif
     // struct timespec tn;
-    
-    matrix_buffer[0] = 0x00; 
-    matrix_buffer[1] = 0x00; 
-    matrix_buffer[2] = 0x00; 
-    matrix_buffer[3] = 0x00; 
-    matrix_buffer[4] = 0x70; 
-    matrix_buffer[5] = 0x00; 
     
     /****** Packet API ******/
     while (likely(!do_shutdown && (!num_to_send || numPkts < num_to_send))) {
