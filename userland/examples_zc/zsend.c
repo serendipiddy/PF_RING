@@ -227,9 +227,6 @@ static void forge_udp_packet(u_char *buffer, u_int idx) {
     for(i = 6; i < 12; i++) buffer[i] = i; /* ethernet source */
     buffer[12] = 0x08, buffer[13] = 0x00; /* ethtype to IP 0x0800 */
     
-    buffer[4] = 0x70; 
-    buffer[5] = 0x00; 
-
     ip_header = (struct ip_header*) &buffer[sizeof(struct ether_header)];
     ip_header->ihl = 5;
     ip_header->version = 4;
@@ -631,7 +628,8 @@ void *send_traffic(void *user) {
               puts("upping 3");
               matrix_buffer[3]++;
               if (matrix_buffer[3] == 0x00) {
-                matrix_buffer[2]++;
+                  puts("upping 2");
+                  matrix_buffer[2]++;
               }
           }
       }
