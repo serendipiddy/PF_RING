@@ -622,19 +622,16 @@ void *send_traffic(void *user) {
       /* Set destination address with a 16 bit ID */
       matrix_buffer[5]++;
       if (matrix_buffer[5] == 0x00) {
-          puts("upping 4");
           matrix_buffer[4]++;
           if (matrix_buffer[4] == 0x00) {
-              puts("upping 3");
               matrix_buffer[3]++;
               if (matrix_buffer[3] == 0x00) {
-                  puts("upping 2");
                   matrix_buffer[2]++;
               }
           }
       }
       
-      printf("%02X:%02X:%02X\n", matrix_buffer[3], matrix_buffer[4], matrix_buffer[5]);
+      // printf("%02X:%02X:%02X\n", matrix_buffer[3], matrix_buffer[4], matrix_buffer[5]);
 
       if(tosend) {
             buffers[buffer_id]->len = tosend->len, memcpy(buffer, tosend->pkt, tosend->len);
