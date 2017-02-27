@@ -650,6 +650,7 @@ void *send_traffic(void *user) {
         }
       }
 
+      puts("done if(tosend)");
       
       // if (append_timestamp)
         // buffers[buffer_id]->len = append_packet_ts(buffer, buffers[buffer_id]->len);
