@@ -620,16 +620,16 @@ void *send_traffic(void *user) {
       u_char *buffer = pfring_zc_pkt_buff_data(buffers[buffer_id], zq);
 
       /* Set destination address with a 16 bit ID */
-      matrix_buffer[5]++;
-      if (matrix_buffer[5] == 0x00) {
-          matrix_buffer[4]++;
-          if (matrix_buffer[4] == 0x00) {
-              matrix_buffer[3]++;
-              if (matrix_buffer[3] == 0x00) {
-                  matrix_buffer[2]++;
-              }
-          }
-      }
+      // matrix_buffer[5]++;
+      // if (matrix_buffer[5] == 0x00) {
+          // matrix_buffer[4]++;
+          // if (matrix_buffer[4] == 0x00) {
+              // matrix_buffer[3]++;
+              // if (matrix_buffer[3] == 0x00) {
+                  // matrix_buffer[2]++;
+              // }
+          // }
+      // }
       
       // printf("%02X:%02X:%02X\n", matrix_buffer[3], matrix_buffer[4], matrix_buffer[5]);
 
