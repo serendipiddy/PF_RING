@@ -128,7 +128,7 @@ void *time_pulse_thread(void *data) {
   while (likely(!do_shutdown)) {
     /* clock_gettime takes up to 30 nsec to get the time */
     clock_gettime(CLOCK_REALTIME, &tn);
-    if (append_timestamp) *pulse_timestamp_ns_n = ((u_int64_t) ((u_int64_t) htonl(tn.tv_sec) << 32) | htonl(tn.tv_nsec));
+    if (append_timestamp || use_lock_buffer) *pulse_timestamp_ns_n = ((u_int64_t) ((u_int64_t) htonl(tn.tv_sec) << 32) | htonl(tn.tv_nsec));
     if (use_pulse_time)   *pulse_timestamp_ns   = ((u_int64_t) ((u_int64_t) tn.tv_sec * 1000000000) + tn.tv_nsec);
   }
 
@@ -740,26 +740,26 @@ int main(int argc, char* argv[]) {
       break;
     case 'f':
       if((pt = pcap_open_offline(optarg, ebuf)) != NULL)
-	printf("Reading packets from pcap file %s\n", optarg);
+        printf("Reading packets from pcap file %s\n", optarg);
       else
-	printf("WARNING: unable to read packets from pcap file %s\n", optarg);
+        printf("WARNING: unable to read packets from pcap file %s\n", optarg);
       break;
     case 'l':
       packet_len = atoi(optarg);
       break;
     case 'm':
       {
-	u_int mac_a, mac_b, mac_c, mac_d, mac_e, mac_f;
+        u_int mac_a, mac_b, mac_c, mac_d, mac_e, mac_f;
 
-	if(sscanf(optarg, "%02X:%02X:%02X:%02X:%02X:%02X", 
-		  &mac_a, &mac_b, &mac_c, &mac_d, &mac_e, &mac_f) != 6) {
-	  printf("Invalid MAC address format (XX:XX:XX:XX:XX:XX)\n");
-	  return(0);
-	} else {
-	  reforge_mac = 1;
-	  mac_address[0] = mac_a, mac_address[1] = mac_b, mac_address[2] = mac_c;
-	  mac_address[3] = mac_d, mac_address[4] = mac_e, mac_address[5] = mac_f;
-	}
+        if(sscanf(optarg, "%02X:%02X:%02X:%02X:%02X:%02X", 
+              &mac_a, &mac_b, &mac_c, &mac_d, &mac_e, &mac_f) != 6) {
+          printf("Invalid MAC address format (XX:XX:XX:XX:XX:XX)\n");
+          return(0);
+        } else {
+          reforge_mac = 1;
+          mac_address[0] = mac_a, mac_address[1] = mac_b, mac_address[2] = mac_c;
+          mac_address[3] = mac_d, mac_address[4] = mac_e, mac_address[5] = mac_f;
+        }
       }
       break;
     case 'M':
@@ -969,7 +969,8 @@ int main(int argc, char* argv[]) {
   if (use_pulse_time)   while (!*pulse_timestamp_ns   && !do_shutdown); /* wait for ts */
   if (append_timestamp || use_lock_buffer) while (!*pulse_timestamp_ns_n && !do_shutdown); /* wait for ts */
   
-  /* Lock buffer init */#ifndef USE_BURST_API
+  /* Lock buffer init */
+  #ifndef USE_BURST_API
   puts("using burst API");
   #else
   puts(" ### NOT using burst API :( ### ");
@@ -1000,7 +1001,7 @@ int main(int argc, char* argv[]) {
     pthread_join(time_thread, NULL);
 
   if (use_lock_buffer) 
-      pthread_join(buffer_write_thread_id, NULL );
+    pthread_join(buffer_write_thread_id, NULL );
 
   if (!ipc_q_attach) {
     pfring_zc_destroy_cluster(zc);
