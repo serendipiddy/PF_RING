@@ -631,7 +631,7 @@ void *send_traffic(void *user) {
           // }
       // }
       
-      // printf("%02X:%02X:%02X\n", matrix_buffer[3], matrix_buffer[4], matrix_buffer[5]);
+      printf("%02X:%02X:%02X\n", matrix_buffer[3], matrix_buffer[4], matrix_buffer[5]);
 
       if(tosend) {
             buffers[buffer_id]->len = tosend->len, memcpy(buffer, tosend->pkt, tosend->len);
@@ -983,7 +983,6 @@ int main(int argc, char* argv[]) {
       pthread_create( &buffer_write_thread_id, NULL, lock_buffer_write_loop, lb_buffer);
       lock_buffer_log_fp = fopen(lock_buffer_filename, "w+b"); 
       puts("Lock buffer thread created and file opened");
-      puts("really using lock buffer");
   }
   
   pthread_create(&thread, NULL, send_traffic, NULL);
