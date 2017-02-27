@@ -363,7 +363,7 @@ void sigproc(int sig) {
   if(called) return; else called = 1;
 
   do_shutdown = 1;
-  lock_buffer_finish(lb_buffer);
+  if(use_lock_buffer) lock_buffer_finish(lb_buffer);
 
   pfring_zc_queue_breakloop(zq);
 }
@@ -456,48 +456,48 @@ void *send_traffic(void *user) {
       if ((num_orig_pcap_pkts-1) < pkts_offset) continue;
 
       if (num_pcap_pkts == 0) {
-	beginning.tv_sec = h->ts.tv_sec;
-	beginning.tv_usec = h->ts.tv_usec;
+        beginning.tv_sec = h->ts.tv_sec;
+        beginning.tv_usec = h->ts.tv_usec;
       }
 
       p = (struct packet *) malloc(sizeof(struct packet));
       if(p) {
-	p->len = h->caplen;
-	if(p->len > max_pkt_len) p->len = max_pkt_len;
-	if (datalink == DLT_LINUX_SLL) p->len -= 2;
-	p->ticks_from_beginning = (((h->ts.tv_sec - beginning.tv_sec) * 1000000) + (h->ts.tv_usec - beginning.tv_usec)) * hz / 1000000;
-	p->next = NULL;
-	p->pkt = (char*)malloc(p->len);
+        p->len = h->caplen;
+        if(p->len > max_pkt_len) p->len = max_pkt_len;
+        if (datalink == DLT_LINUX_SLL) p->len -= 2;
+        p->ticks_from_beginning = (((h->ts.tv_sec - beginning.tv_sec) * 1000000) + (h->ts.tv_usec - beginning.tv_usec)) * hz / 1000000;
+        p->next = NULL;
+        p->pkt = (char*)malloc(p->len);
 
-	if(p->pkt == NULL) {
-	  printf("Not enough memory\n");
-	  break;
-	} else {
-	  if (datalink == DLT_LINUX_SLL) {
-	    memcpy(p->pkt, pkt, 12);
-	    memcpy(&p->pkt[12], &pkt[14], p->len - 14);
-	  } else {
-	    memcpy(p->pkt, pkt, p->len);
-	  }
-	  if(reforge_mac)
-	    memcpy((u_char *) p->pkt, mac_address, 6);
-	}
+        if(p->pkt == NULL) {
+          printf("Not enough memory\n");
+          break;
+        } else {
+          if (datalink == DLT_LINUX_SLL) {
+            memcpy(p->pkt, pkt, 12);
+            memcpy(&p->pkt[12], &pkt[14], p->len - 14);
+          } else {
+            memcpy(p->pkt, pkt, p->len);
+          }
+          if(reforge_mac)
+            memcpy((u_char *) p->pkt, mac_address, 6);
+        }
 
-	if(last) {
-	  last->next = p;
-	  last = p;
-	} else
-	  pkt_head = p, last = p;
-      } else {
-	printf("Not enough memory\n");
-	break;
-      }
+        if(last) {
+          last->next = p;
+          last = p;
+        } else
+          pkt_head = p, last = p;
+          } else {
+        printf("Not enough memory\n");
+        break;
+          }
 
-      if(verbose)
-	printf("Read %d bytes packet from pcap file [%lu.%lu Secs =  %lu ticks@%luhz from beginning]\n",
-	       p->len, h->ts.tv_sec - beginning.tv_sec, h->ts.tv_usec - beginning.tv_usec,
-	       (long unsigned int)p->ticks_from_beginning,
-	       (long unsigned int)hz);
+          if(verbose)
+        printf("Read %d bytes packet from pcap file [%lu.%lu Secs =  %lu ticks@%luhz from beginning]\n",
+               p->len, h->ts.tv_sec - beginning.tv_sec, h->ts.tv_usec - beginning.tv_usec,
+               (long unsigned int)p->ticks_from_beginning,
+               (long unsigned int)hz);
 
       avg_send_len += p->len;
       num_pcap_pkts++;
@@ -983,6 +983,7 @@ int main(int argc, char* argv[]) {
       pthread_create( &buffer_write_thread_id, NULL, lock_buffer_write_loop, lb_buffer);
       lock_buffer_log_fp = fopen(lock_buffer_filename, "w+b"); 
       puts("Lock buffer thread created and file opened");
+      puts("really using lock buffer");
   }
   
   pthread_create(&thread, NULL, send_traffic, NULL);
