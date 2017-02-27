@@ -967,10 +967,10 @@ int main(int argc, char* argv[]) {
   signal(SIGINT,  sigproc);
 
   if (use_pulse_time)   pulse_timestamp_ns   = calloc(CACHE_LINE_LEN/sizeof(u_int64_t), sizeof(u_int64_t));
-  if (append_timestamp) pulse_timestamp_ns_n = calloc(CACHE_LINE_LEN/sizeof(u_int64_t), sizeof(u_int64_t));
+  if (append_timestamp || use_lock_buffer) pulse_timestamp_ns_n = calloc(CACHE_LINE_LEN/sizeof(u_int64_t), sizeof(u_int64_t));
   if (append_timestamp || use_pulse_time) pthread_create(&time_thread, NULL, time_pulse_thread, NULL);
   if (use_pulse_time)   while (!*pulse_timestamp_ns   && !do_shutdown); /* wait for ts */
-  if (append_timestamp) while (!*pulse_timestamp_ns_n && !do_shutdown); /* wait for ts */
+  if (append_timestamp || use_lock_buffer) while (!*pulse_timestamp_ns_n && !do_shutdown); /* wait for ts */
   
   /* Lock buffer init */#ifndef USE_BURST_API
   puts("using burst API");
