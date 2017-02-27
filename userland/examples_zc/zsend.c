@@ -650,7 +650,6 @@ void *send_traffic(void *user) {
         }
       }
 
-      puts("done if(tosend)");
       
       // if (append_timestamp)
         // buffers[buffer_id]->len = append_packet_ts(buffer, buffers[buffer_id]->len);
@@ -670,17 +669,20 @@ void *send_traffic(void *user) {
           get_packet_timestamp(lb_it);
           lock_buffer_push (lb_buffer, lb_it); 
       }
+      puts("done if(use_lock_buffer)");
 
       while (unlikely((sent_bytes = pfring_zc_send_pkt(zq, &buffers[buffer_id], flush_packet)) < 0)) {
         if (unlikely(do_shutdown)) break;
         if (!active) usleep(1);
       }
+      puts("done unlikely()");
 
       numPkts++;
       numBytes += sent_bytes + 24; /* 8 Preamble + 4 CRC + 12 IFG */
 
       buffer_id++;
       buffer_id &= NBUFFMASK;
+      puts("done buffer_id");
 
       if(pps > 0) {
         u_int8_t synced = 0;
@@ -692,6 +694,7 @@ void *send_traffic(void *user) {
             if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
         }
       }
+      puts("done if(pps>0)");
       
     }
 
