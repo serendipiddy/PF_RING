@@ -664,12 +664,9 @@ void *send_traffic(void *user) {
       {
           lb_it->id++;
           memcpy(&lb_it->dst, matrix_buffer, 6);
-          puts("done memcpy()");
           
           get_packet_timestamp(lb_it);
-          puts("done get_packet_ts()");
           lock_buffer_push (lb_buffer, lb_it); 
-          puts("done lb_push()");
       }
 
       while (unlikely((sent_bytes = pfring_zc_send_pkt(zq, &buffers[buffer_id], flush_packet)) < 0)) {
