@@ -664,7 +664,7 @@ void *send_traffic(void *user) {
       {
           lb_it->id++;
           if (pt) {
-            memcpy(&lb_it->dst, buffer, 6);
+            memcpy(&lb_it->dst, buffer, 6); // use the pcap's instead of forged mac
           }
           else {
             memcpy(&lb_it->dst, matrix_buffer, 6);
