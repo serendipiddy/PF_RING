@@ -129,12 +129,13 @@ void lock_buffer_pull_final (struct lock_buffer * lb, struct lock_buffer_section
     // printf("Pulling final items from buffer\n");
     
     // Get the last written pull and final push positions
+    if (lb->pos_pull == lb->pos_push) {
+        puts("push == pull");
+        lbs->start = 0;
+        lbs->end = 0;
+        return;
+    }
     lbs->start = &lb->buffer[lb->pos_pull]; 
-    // if (lb->pos_pull == lb->pos_push) {
-        // puts("push == pull");
-        // lbs->end = 0;
-        // return;
-    // }
     lbs->end   = &lb->buffer[lb->pos_push != 0 ? lb->pos_push : lb->item_num];
 }
 
