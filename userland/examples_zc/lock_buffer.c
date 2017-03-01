@@ -182,7 +182,7 @@ void * lock_buffer_write_loop( void * x ) { // struct lock_buffer * lb) {
     
     // write the remaining items
     lock_buffer_pull_final(lb, lbs);
-    // printf("  Final write: 0x%X (%d)",lbs->start, (lbs->end - lbs->start));
+    printf("  Final write: 0x%X (%d)",lbs->start, (lbs->end - lbs->start));
     fwrite(lbs->start, sizeof(struct id_time), lbs->end - lbs->start, lock_buffer_log_fp);
     
     return NULL;
