@@ -130,7 +130,7 @@ void lock_buffer_pull_final (struct lock_buffer * lb, struct lock_buffer_section
     
     // Get the last written pull and final push positions
     if (lb->pos_pull == lb->pos_push) {
-        puts("push == pull");
+        // puts("push == pull");
         lbs->start = 0;
         lbs->end = 0;
         return;
@@ -189,7 +189,7 @@ void * lock_buffer_write_loop( void * x ) { // struct lock_buffer * lb) {
     // write the remaining items
     lock_buffer_pull_final(lb, lbs);
     // printf("  Final write: 0x%X (%d)\n",lbs->start, (lbs->end - lbs->start));
-    printf("  Final write: (%lu - %lu = %lu)\n", lbs->end, lbs->start, (lbs->end - lbs->start));
+    printf("  Final write: %lu items\n", (lbs->end - lbs->start));
     fwrite(lbs->start, sizeof(struct id_time), lbs->end - lbs->start, lock_buffer_log_fp);
     
     return NULL;
