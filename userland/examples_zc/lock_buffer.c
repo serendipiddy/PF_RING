@@ -130,10 +130,11 @@ void lock_buffer_pull_final (struct lock_buffer * lb, struct lock_buffer_section
     
     // Get the last written pull and final push positions
     lbs->start = &lb->buffer[lb->pos_pull]; 
-    if (lb->pos_pull == lb->pos_push) {
-        lbs->end = 0;
-        return;
-    }
+    // if (lb->pos_pull == lb->pos_push) {
+        // puts("push == pull");
+        // lbs->end = 0;
+        // return;
+    // }
     lbs->end   = &lb->buffer[lb->pos_push != 0 ? lb->pos_push : lb->item_num];
 }
 
