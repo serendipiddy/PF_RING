@@ -852,9 +852,9 @@ int main(int argc, char* argv[]) {
     case 'S':
       append_timestamp = 1;
       bind_time_pulse_core = atoi(optarg);
+        puts("but it's getting the command?");
       break;
     case 'P':
-        puts("but it's getting the command?");
       use_pulse_time = 1;
       bind_time_pulse_core = atoi(optarg);
       break;
