@@ -59,7 +59,7 @@ zfifo: zfifo.o ${LIBPFRING} Makefile
 	${CC} ${CFLAGS} zfifo.o ${LIBS} -o $@
 
 zsend: zsend.o ${LIBPFRING} Makefile
-	${CC} ${CFLAGS} zsend.o ${LIBS} -o $@
+	${CC} ${CFLAGS} zsend.o ${LIBS} -o $@ -lm
 
 zfanout_ipc: zfanout_ipc.o ${LIBPFRING} Makefile
 	${CC} ${CFLAGS} zfanout_ipc.o ${LIBS} -o $@
