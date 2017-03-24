@@ -419,7 +419,6 @@ void printHelp(void) {
   printf("-X <filename>   Log file name for timestamps of packets captured\n");
   printf("-M              Stop at 20,000 packets and wait for 20s before continuing");
   printf("-e <time>       Enables exponentially distributed inter-packet delay, with mean time (s)\n");
-  printf("-E <time>       Sets a linear delta to inter-packet mean time (occurs each second) (requires -e)\n");
   exit(-1);
 }
 
@@ -760,7 +759,7 @@ int main(int argc, char* argv[]) {
 
   startTime.tv_sec = 0;
 
-  while((c = getopt(argc,argv,"ab:c:f:g:hi:m:n:o:p:r:l:zN:S:P:Q:X:sMe:E:")) != '?') {
+  while((c = getopt(argc,argv,"ab:c:f:g:hi:m:n:o:p:r:l:zN:S:P:Q:X:sMe:")) != '?') {
     if((c == 255) || (c == -1)) break;
 
     switch(c) {
@@ -854,9 +853,6 @@ int main(int argc, char* argv[]) {
     case 'e':
       sscanf(optarg, "%lf", &mean_packet_delay);
       pps = (double) 1/mean_packet_delay;
-      break;
-    case 'E':
-      sscanf(optarg, "%lf", &mean_packet_delay_delta);
       break;
     }
   }
