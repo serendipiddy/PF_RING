@@ -637,14 +637,8 @@ void *send_traffic(void *user) {
     
     /* Exponential times. For first iteration */
     if (mean_packet_delay >= 0) {
-        puts("first ticks");
         tick_of_next_tx = ts_ns_start + (ticks)( (double) hz * get_exponential_val(mean_packet_delay) );
-        puts("first ticks done");
-        printf("Start: %llu First: %llu\n", ts_ns_start, tick_of_next_tx);
-        printf("&Time: %llu ", pulse_timestamp_ns);
-        fflush(stdout);
-        printf("Time: %llu\n", *pulse_timestamp_ns);
-        fflush(stdout);
+        // printf("Start: %llu First: %llu\n", ts_ns_start, tick_of_next_tx);
     }
     
     /****** Packet API ******/
@@ -719,12 +713,10 @@ void *send_traffic(void *user) {
       if(pps > 0) {
         u_int8_t synced = 0;
         if (mean_packet_delay >= 0) {
-          puts("next ticks");
-          printf("Time: %llu <Tick: %llu\n", *pulse_timestamp_ns, tick_of_next_tx);
+          // printf("Time: %llu <Tick: %llu\n", *pulse_timestamp_ns, tick_of_next_tx);
           fflush(stdout);
           while(*pulse_timestamp_ns < tick_of_next_tx && !do_shutdown)
             if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
-          puts("next ticks done");
         }
         else if (use_pulse_time) {
           while(*pulse_timestamp_ns - ts_ns_start < numPkts * ns_delta && !do_shutdown)
@@ -737,13 +729,10 @@ void *send_traffic(void *user) {
       
       // calculate the next exponential inter-arrival time
       if (mean_packet_delay >= 0) {
-        puts("calc packet delay");
         // printf("%lu", tick_start + tick_of_next_tx);
         /* RNG shouldn't delay transmission, as ticks continue in background :) */
         tick_of_next_tx += (ticks)( (double) hz * get_exponential_val(mean_packet_delay) );
-        puts("calc packet delay done");
       }
-      puts("this all done");
       
     }
 
@@ -852,7 +841,6 @@ int main(int argc, char* argv[]) {
     case 'S':
       append_timestamp = 1;
       bind_time_pulse_core = atoi(optarg);
-        puts("but it's getting the command?");
       break;
     case 'P':
       use_pulse_time = 1;
