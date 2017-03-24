@@ -102,6 +102,10 @@ struct lock_buffer * lb_buffer;
 int use_hardware = 0;
 int stopHalfWay = 0;
 
+/* Exponentially distributed inter-packet delay stuff */
+u_int64_t tick_of_next_tx = 0; 
+double mean_packet_delay = -1;
+
 static inline void get_packet_timestamp(struct id_time * it) {
     u_int64_t ts = *pulse_timestamp_ns_n;
     it->sec  = ts >> 32; 
@@ -632,6 +636,11 @@ void *send_traffic(void *user) {
 #endif
     // struct timespec tn;
     
+    /* Exponential times. For first iteration */
+    if (mean_packet_delay >= 0) {
+        tick_of_next_tx = ts_ns_start + (ticks)( (double) hz * get_exponential_val(mean_packet_delay) );
+    }
+    
     /****** Packet API ******/
     while (likely(!do_shutdown && (!num_to_send || numPkts < num_to_send))) {
       u_char *buffer = pfring_zc_pkt_buff_data(buffers[buffer_id], zq);
@@ -703,13 +712,24 @@ void *send_traffic(void *user) {
 
       if(pps > 0) {
         u_int8_t synced = 0;
-        if (use_pulse_time) {
+        if (mean_packet_delay >= 0) {
+          while(*pulse_timestamp_ns < tick_of_next_tx && !do_shutdown)
+            if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
+        }
+        else if (use_pulse_time) {
           while(*pulse_timestamp_ns - ts_ns_start < numPkts * ns_delta && !do_shutdown)
             if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
         } else {
           while((getticks() - tick_start) < (numPkts * tick_delta))
             if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
         }
+      }
+      
+      // calculate the next exponential inter-arrival time
+      if (mean_packet_delay >= 0) {
+        // printf("%lu", tick_start + tick_of_next_tx);
+        /* RNG shouldn't delay transmission, as ticks continue in background :) */
+        tick_of_next_tx += (ticks)( (double) hz * get_exponential_val(mean_packet_delay) );
       }
       
     }
@@ -727,13 +747,6 @@ void *send_traffic(void *user) {
 }
 
 /* *************************************** */
-
-/* Exponentially distributed inter-packet delay stuff */
-  u_int64_t ticks_to_wait = 0; 
-  double mean_packet_delay = -1;
-  double mean_packet_delay_delta = -1;
-  double mean_packet_delay_live = -1;
-  double exp_delay = 0;
 
 int main(int argc, char* argv[]) {
   char *device = NULL, c;
@@ -840,7 +853,6 @@ int main(int argc, char* argv[]) {
       break;
     case 'e':
       sscanf(optarg, "%lf", &mean_packet_delay);
-      sscanf(optarg, "%lf", &mean_packet_delay_live);
       pps = (double) 1/mean_packet_delay;
       break;
     case 'E':
