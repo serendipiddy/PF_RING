@@ -854,6 +854,7 @@ int main(int argc, char* argv[]) {
       bind_time_pulse_core = atoi(optarg);
       break;
     case 'P':
+        puts("but it's getting the command?");
       use_pulse_time = 1;
       bind_time_pulse_core = atoi(optarg);
       break;
