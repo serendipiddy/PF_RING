@@ -108,6 +108,21 @@ static inline void get_packet_timestamp(struct id_time * it) {
     it->nsec = ts & 0xffffffff;
 }
 
+/**
+ * Pull observation of exponential random variable, given mean.
+ * Calculated using inversion of CDF.
+ */
+double get_exponential_val(double mean) {
+    double runif, rexp;
+
+    do { runif = drand48(); } /* or just use rand() if not-found */
+    while (runif == 0);
+
+    rexp = -log(runif) * mean; /* X = -ln(u)*(1/lam) = -ln(u)*mean */
+
+    return(rexp);
+}
+
 /* *************************************** */
 
 typedef u_int64_t ticks;
@@ -399,6 +414,8 @@ void printHelp(void) {
   printf("-Q <sock>       Enable VM support to attach a consumer from a VM (<sock> is a QEMU monitor sockets)\n");
   printf("-X <filename>   Log file name for timestamps of packets captured\n");
   printf("-M              Stop at 20,000 packets and wait for 20s before continuing");
+  printf("-e <time>       Enables exponentially distributed inter-packet delay, with mean time (s)\n");
+  printf("-E <time>       Sets a linear delta to inter-packet mean time (occurs each second) (requires -e)\n");
   exit(-1);
 }
 
@@ -711,6 +728,13 @@ void *send_traffic(void *user) {
 
 /* *************************************** */
 
+/* Exponentially distributed inter-packet delay stuff */
+  u_int64_t ticks_to_wait = 0; 
+  double mean_packet_delay = -1;
+  double mean_packet_delay_delta = -1;
+  double mean_packet_delay_live = -1;
+  double exp_delay = 0;
+
 int main(int argc, char* argv[]) {
   char *device = NULL, c;
   pthread_t thread;
@@ -723,7 +747,7 @@ int main(int argc, char* argv[]) {
 
   startTime.tv_sec = 0;
 
-  while((c = getopt(argc,argv,"ab:c:f:g:hi:m:n:o:p:r:l:zN:S:P:Q:X:sM")) != '?') {
+  while((c = getopt(argc,argv,"ab:c:f:g:hi:m:n:o:p:r:l:zN:S:P:Q:X:sMe:E:")) != '?') {
     if((c == 255) || (c == -1)) break;
 
     switch(c) {
@@ -813,6 +837,14 @@ int main(int argc, char* argv[]) {
     case 'X':
       use_lock_buffer = 1;
       lock_buffer_filename = strdup(optarg);
+      break;
+    case 'e':
+      sscanf(optarg, "%lf", &mean_packet_delay);
+      sscanf(optarg, "%lf", &mean_packet_delay_live);
+      pps = (double) 1/mean_packet_delay;
+      break;
+    case 'E':
+      sscanf(optarg, "%lf", &mean_packet_delay_delta);
       break;
     }
   }
