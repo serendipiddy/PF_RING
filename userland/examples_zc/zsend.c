@@ -1034,6 +1034,11 @@ int main(int argc, char* argv[]) {
   puts(" ### NOT using burst API :( ### ");
   #endif
   
+  if(use_pulse_time)
+      puts("using pulse time");
+  else
+      puts("not using pulse time");
+  
   if (use_lock_buffer) 
   {
       unsigned int sample_secs = pps * 20;  // // 4 minutes of data
