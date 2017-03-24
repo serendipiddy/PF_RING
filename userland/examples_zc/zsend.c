@@ -640,7 +640,7 @@ void *send_traffic(void *user) {
         puts("first ticks");
         tick_of_next_tx = ts_ns_start + (ticks)( (double) hz * get_exponential_val(mean_packet_delay) );
         puts("first ticks done");
-        printf("Start: %llu First: %llu", ts_ns_start, tick_of_next_tx);
+        printf("Start: %llu First: %llu\n", ts_ns_start, tick_of_next_tx);
     }
     
     /****** Packet API ******/
@@ -716,7 +716,8 @@ void *send_traffic(void *user) {
         u_int8_t synced = 0;
         if (mean_packet_delay >= 0) {
           puts("next ticks");
-          printf("Time: %llu <Tick: %llu", *pulse_timestamp_ns, tick_of_next_tx);
+          printf("Time: %llu <Tick: %llu\n", *pulse_timestamp_ns, tick_of_next_tx);
+          fflush(stdout);
           while(*pulse_timestamp_ns < tick_of_next_tx && !do_shutdown)
             if (!synced) pfring_zc_sync_queue(zq, tx_only), synced = 1;
           puts("next ticks done");
